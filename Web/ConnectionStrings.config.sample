@@ -1,0 +1,4 @@
+﻿<connectionStrings>
+  <add name="HomeControlDB" connectionString="***YOUR CONNECTIONSTRING HERE***" />
+  <add name="SerilogRavenDB" connectionString="***YOUR CONNECTIONSTRING HERE***" />
+</connectionStrings>
