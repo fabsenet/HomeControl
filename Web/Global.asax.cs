@@ -17,23 +17,36 @@ namespace Web
     {
         protected void Application_Start()
         {
-            var logs = new DocumentStore { ConnectionStringName = "SerilogRavenDB" }.Initialize();
+            ConfigureLogging();
+
+
+            var documentStore = new DocumentStore { ConnectionStringName = "HomeControlDB" }.Initialize();
+
+            AreaRegistration.RegisterAllAreas();
+
+            ControllerBuilder.Current.SetControllerFactory(new MvcConfig(documentStore));
+            GlobalConfiguration.Configure(new WebApiConfig(documentStore).Register);
+
+            FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
+            RouteConfig.RegisterRoutes(RouteTable.Routes);
+            BundleConfig.RegisterBundles(BundleTable.Bundles);
+
+        }
+
+        private static void ConfigureLogging()
+        {
+            var logs = new DocumentStore {ConnectionStringName = "SerilogRavenDB"}.Initialize();
 
             var logger = new LoggerConfiguration()
                 .MinimumLevel.Verbose()
                 .WriteTo.RavenDB(logs)
                 .WriteTo.Trace()
-                .CreateLogger();
+                .CreateLogger()
+                .ForContext("App", "HomeControl.Web");
 
             logger.Debug("The WEB application startet at {StartTime} on server {ServerName}", DateTime.Now, Environment.MachineName);
 
             Log.Logger = logger;
-
-            AreaRegistration.RegisterAllAreas();
-            GlobalConfiguration.Configure(WebApiConfig.Register);
-            FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
-            RouteConfig.RegisterRoutes(RouteTable.Routes);
-            BundleConfig.RegisterBundles(BundleTable.Bundles);
         }
     }
 }
