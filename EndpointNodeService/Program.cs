@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.ServiceProcess;
-using System.Text;
-using System.Threading.Tasks;
 using Raven.Client.Document;
 using Serilog;
 
@@ -15,19 +11,19 @@ namespace EndpointNodeService
         /// <summary>
         /// Der Haupteinstiegspunkt für die Anwendung.
         /// </summary>
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             var isRunningAsService = args.Any(a => a == "/s");
 
             ConfigureLogger();
-                var service = new EndpointCommunicationClientService();
+            var service = new EndpointCommunicationClientService();
             if (isRunningAsService)
             {
-                var ServicesToRun = new ServiceBase[]
+                var servicesToRun = new ServiceBase[]
                 {
                     service
                 };
-                ServiceBase.Run(ServicesToRun);
+                ServiceBase.Run(servicesToRun);
             }
             else
             {

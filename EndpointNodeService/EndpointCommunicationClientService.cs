@@ -13,6 +13,8 @@ namespace EndpointNodeService
     {
         private readonly ILogger _log;
         private readonly HttpClient _httpClient;
+        private CancellationTokenSource _cancellationTokenSource;
+        private Task _pingTask;
 
         public EndpointCommunicationClientService()
         {
@@ -35,19 +37,28 @@ namespace EndpointNodeService
         protected override void OnStart(string[] args)
         {
             _log.Debug("Service starting. Command line is {CommandLine}", Environment.CommandLine);
-            var cts = new CancellationTokenSource();
+            _cancellationTokenSource = new CancellationTokenSource();
 
-            var pingTask = PingContiniously(cts.Token);
-            cts.CancelAfter(TimeSpan.FromMinutes(2));
-            pingTask.Wait();
+            _pingTask = PingContiniously(_cancellationTokenSource.Token);
+        }
+
+        protected override void OnShutdown()
+        {
+            base.OnShutdown();
         }
 
         private async Task PingContiniously(CancellationToken token)
         {
             while (!token.IsCancellationRequested)
             {
-                await PingToService(token);
-                await Task.Delay(TimeSpan.FromSeconds(5), token);
+                try
+                {
+                    await PingToService(token);
+                    await Task.Delay(TimeSpan.FromSeconds(5), token);
+                }
+                catch (TaskCanceledException)
+                {
+                }
             }
         }
 
@@ -68,11 +79,16 @@ namespace EndpointNodeService
         protected override void OnStop()
         {
             _log.Debug("Service stopping.");
+            _cancellationTokenSource?.Cancel();
+            _pingTask?.Wait();
+            _log.Debug("Service stopped.");
         }
 
         internal void Run()
         {
             OnStart(null);
+            Console.WriteLine("Press enter to stop the application!");
+            Console.ReadLine();
             OnStop();
         }
     }
