@@ -1,31 +1,23 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
 using System.ServiceProcess;
 using Raven.Client.Document;
 using Serilog;
 
-namespace HomeControl.EndpointNodeService
+namespace HomeControl.CentralService
 {
-    static class Program
+    class Program
     {
-        /// <summary>
-        /// Der Haupteinstiegspunkt für die Anwendung.
-        /// </summary>
-        private static void Main(string[] args)
+        static void Main(string[] args)
         {
-            var isRunningAsService = args.Any(a => a == "/s");
-
             ConfigureLogger();
-            var service = new EndpointCommunicationClientService();
+            var isRunningAsService = args.Any(a => a == "/s");
+            Log.Verbose("isRunningAsService = {isRunningAsService}", isRunningAsService);
+            var service = new MessageReceiverService();
             if (isRunningAsService)
             {
-                var servicesToRun = new ServiceBase[]
-                {
-                    service
-                };
-                ServiceBase.Run(servicesToRun);
+                ServiceBase.Run(service);
             }
             else
             {
@@ -46,7 +38,7 @@ namespace HomeControl.EndpointNodeService
                 .WriteTo.ColoredConsole()
                 .Enrich.WithMachineName()
                 .Enrich.WithThreadId()
-                .Enrich.WithProperty("App", "HomeControl.EndpointNodeService")
+                .Enrich.WithProperty("App", "HomeControl.CentralService")
                 .CreateLogger();
 
             logger.Debug("The {application} startet at {StartTime} on server {ServerName}", Process.GetCurrentProcess().ProcessName, DateTime.Now, Environment.MachineName);

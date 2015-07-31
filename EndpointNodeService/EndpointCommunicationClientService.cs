@@ -1,37 +1,30 @@
 ﻿using System;
+using System.Configuration;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.ServiceProcess;
 using System.Threading;
 using System.Threading.Tasks;
+using Amqp;
+using Amqp.Framing;
 using Serilog;
 
-namespace EndpointNodeService
+namespace HomeControl.EndpointNodeService
 {
-    public partial class EndpointCommunicationClientService : ServiceBase
+    public class EndpointCommunicationClientService : ServiceBase
     {
         private readonly ILogger _log;
-        private readonly HttpClient _httpClient;
         private CancellationTokenSource _cancellationTokenSource;
         private Task _pingTask;
+        private SenderLink _sender;
+        private Session _session;
+        private Connection _connection;
 
         public EndpointCommunicationClientService()
         {
             _log = Log.ForContext<EndpointCommunicationClientService>();
-            InitializeComponent();
-
-
-            _httpClient = new HttpClient(new HttpClientHandler()
-            {
-                Credentials = new NetworkCredential("a", "b"),
-                UseDefaultCredentials = false,
-                PreAuthenticate = true
-            });
-
-            _httpClient.DefaultRequestHeaders.Accept.Clear();
-            _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            _httpClient.BaseAddress = new Uri("https://fabse.net/HomeControl/");
+            ServiceName = "EndpointCommunicationClientService";
         }
 
         protected override void OnStart(string[] args)
@@ -39,26 +32,26 @@ namespace EndpointNodeService
             _log.Debug("Service starting. Command line is {CommandLine}", Environment.CommandLine);
             _cancellationTokenSource = new CancellationTokenSource();
 
-            _pingTask = PingContiniously(_cancellationTokenSource.Token);
-        }
+            string address = ConfigurationManager.ConnectionStrings["AMQP"].ConnectionString;
+            _connection = new Connection(new Address(address));
+            _session = new Session(_connection);
+            _sender = new SenderLink(_session, "message-client", "message_processor");
 
-        protected override void OnShutdown()
-        {
-            base.OnShutdown();
+            _pingTask = PingContiniously(_cancellationTokenSource.Token);
         }
 
         private async Task PingContiniously(CancellationToken token)
         {
-            while (!token.IsCancellationRequested)
+            try
             {
-                try
+                while (!token.IsCancellationRequested)
                 {
                     await PingToService(token);
                     await Task.Delay(TimeSpan.FromSeconds(5), token);
                 }
-                catch (TaskCanceledException)
-                {
-                }
+            }
+            catch (TaskCanceledException)
+            {
             }
         }
 
@@ -67,8 +60,11 @@ namespace EndpointNodeService
             _log.Debug("Pinging");
             try
             {
-                    var pingResult = await _httpClient.PostAsJsonAsync("api/Ping", Environment.MachineName, token);
-                    pingResult.EnsureSuccessStatusCode();
+                Message message = new Message("hello");
+                message.Properties = new Properties() { MessageId = "msg" };
+                message.ApplicationProperties = new ApplicationProperties();
+                message.ApplicationProperties["sn"] = 17;
+                await _sender.SendAsync(message);
             }
             catch (Exception ex)
             {
@@ -81,10 +77,15 @@ namespace EndpointNodeService
             _log.Debug("Service stopping.");
             _cancellationTokenSource?.Cancel();
             _pingTask?.Wait();
+
+            _sender.Close();
+            _session.Close();
+            _connection.Close();
+
             _log.Debug("Service stopped.");
         }
 
-        internal void Run()
+        internal void RunInteractively()
         {
             OnStart(null);
             Console.WriteLine("Press enter to stop the application!");
