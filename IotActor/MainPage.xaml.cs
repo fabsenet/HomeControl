@@ -1,0 +1,36 @@
+﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
+using Windows.UI.Xaml.Controls;
+
+namespace IotActor
+{
+    public sealed partial class MainPage : Page
+    {
+        private readonly AmqpEndpointController _controller;
+
+        public MainPage()
+        {
+            this.InitializeComponent();
+
+            _controller = new AmqpEndpointController();
+
+            //var token = new CancellationTokenSource();
+            //var led = new LedOnOffSwitch(18, token.Token);
+
+            //while (true)
+            //{
+            //    for (int i = 0; i < 20; i++)
+            //    {
+            //        led.SetState(i%2==0);
+            //        Task.Delay(TimeSpan.FromMilliseconds(500)).Wait();
+            //    }
+            //    for (int i = 0; i < 4; i++)
+            //    {
+            //        led.SetState(i%2==0);
+            //        Task.Delay(TimeSpan.FromMilliseconds(5000)).Wait();
+            //    }
+            //}
+        }
+    }
+}

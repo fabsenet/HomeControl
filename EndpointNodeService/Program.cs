@@ -21,11 +21,7 @@ namespace HomeControl.EndpointNodeService
             var service = new EndpointCommunicationClientService();
             if (isRunningAsService)
             {
-                var servicesToRun = new ServiceBase[]
-                {
-                    service
-                };
-                ServiceBase.Run(servicesToRun);
+                ServiceBase.Run(new ServiceBase[]{service});
             }
             else
             {

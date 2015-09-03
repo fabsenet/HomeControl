@@ -23,11 +23,6 @@ namespace HomeControl.CentralService
         {
             _log.Debug("Service starting. Command line is {CommandLine}", Environment.CommandLine);
 
-
-            // uncomment the following to write frame traces
-            //Trace.TraceLevel = TraceLevel.Frame;
-            //Trace.TraceListener = (f, a) => Console.WriteLine(DateTime.Now.ToString("[hh:ss.fff]") + " " + string.Format(f, a));
-
             Uri addressUri = new Uri(ConfigurationManager.ConnectionStrings["AMQP"].ConnectionString);
             _host = new ContainerHost(new Uri[] { addressUri }, null, addressUri.UserInfo);
             _host.Open();
