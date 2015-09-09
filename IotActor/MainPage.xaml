@@ -11,7 +11,7 @@
         <XamlStuff:InvertedBooleanToVisibilityConverter x:Key="InvertedBooleanToVisibilityConverter"/>
         <XamlStuff:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
         <DataTemplate x:Key="DataTemplate1">
-            <StackPanel Orientation="Horizontal">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                 <Grid Height="60" Width="60">
                     <Ellipse Fill="#FF4B1306" Stroke="Black" Width="60" Visibility="{Binding IsOn, Converter={StaticResource InvertedBooleanToVisibilityConverter}}" />
                     <Ellipse Fill="#FFF53D14" Stroke="Black" Width="60" Visibility="{Binding IsOn, Converter={StaticResource BooleanToVisibilityConverter}}" />
@@ -26,7 +26,7 @@
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <Grid.RowDefinitions>
             <RowDefinition />
-            <RowDefinition Height="2*" />
+            <RowDefinition Height="3*" />
             <RowDefinition />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
@@ -34,6 +34,6 @@
             <ColumnDefinition Width="3*"/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <ListBox x:Name="listBox" ItemsSource="{Binding}" ItemTemplate="{StaticResource DataTemplate1}" d:LayoutOverrides="LeftMargin, RightMargin" Grid.Column="1" Grid.Row="1" Background="{x:Null}"/>
+        <ListView x:Name="ledPinList" ItemsSource="{Binding}" ItemTemplate="{StaticResource DataTemplate1}" d:LayoutOverrides="LeftMargin, RightMargin" Grid.Column="1" Grid.Row="1" Background="{x:Null}" SelectionMode="None"/>
     </Grid>
 </Page>
