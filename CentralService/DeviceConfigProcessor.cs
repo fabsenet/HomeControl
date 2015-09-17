@@ -24,6 +24,7 @@ namespace HomeControl.CentralService
 
             var request = JsonConvert.DeserializeObject<DeviceConfigRequest>(requestContext.Message.Body as string);
 
+            var deviceName = request.DeviceName;
             //get config here based on device name
 
             var response = new DeviceConfigResponse()
@@ -52,23 +53,21 @@ namespace HomeControl.CentralService
             _log.Verbose("Replying with {@message}", responseMsg);
             requestContext.Complete(responseMsg);
 
-
-            //not yet working
             //Task.Delay(1000).ContinueWith((_) =>
             //                              {
             //                                  _log.Information("Sending led on off command!");
             //                                  var command = new LedOnOffSetStateCommand()
-            //                                                {
-            //                                                    PinNumber = 18,
-            //                                                    DesiredState = true
-            //                                                };
+            //                                  {
+            //                                      PinNumber = 18,
+            //                                      DesiredState = true
+            //                                  };
             //                                  var msg = new Message(JsonConvert.SerializeObject(command))
-            //                                            {
-            //                                                ApplicationProperties = new ApplicationProperties()
-            //                                                                        {
-            //                                                                            ["CommandType"] = nameof(LedOnOffSetStateCommand)
-            //                                                                        }
-            //                                            };
+            //                                  {
+            //                                      ApplicationProperties = new ApplicationProperties()
+            //                                      {
+            //                                          ["CommandType"] = nameof(LedOnOffSetStateCommand)
+            //                                      }
+            //                                  };
             //                                  requestContext.Link.SendMessage(msg, new ByteBuffer(10000, true));
             //                              });
         }

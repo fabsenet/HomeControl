@@ -9,12 +9,12 @@ using Amqp;
 using Amqp.Framing;
 using HomeControl.Shared.Model;
 using Newtonsoft.Json;
-using TraceLevel = Amqp.TraceLevel;
 
 namespace IotActor
 {
     public class AmqpClientEndpointController
     {
+        private const string DeviceConfigReplyTo = "device_config_reply";
         private readonly ObservableCollection<LedOnOffSwitch> _ledOnOffSwitches;
         private readonly CoreDispatcher _dispatcher;
         readonly Connection _connection;
@@ -36,23 +36,36 @@ namespace IotActor
             var attach = new Attach()
                          {
                              Source = new Source() { Address = "device_config"},
-                             Target = new Target() { Address = "device_config_reply" }
+                             Target = new Target() { Address = DeviceConfigReplyTo }
                          };
 
-            _deviceConfigReceiver = new ReceiverLink(_session, "recv-link", attach, null);
+            _deviceConfigReceiver = new ReceiverLink(_session, "client-config-recv-link", attach, null);
             _deviceConfigReceiver.Start(50, OnDeviceConfigReceive);
 
-            _deviceConfigSender = new SenderLink(_session, "send-link", "device_config");
+            _deviceConfigSender = new SenderLink(_session, "client-config-send-link", "device_config");
 
-            _dataReceiver = new ReceiverLink(_session, "recv-link", "command");
+            _dataReceiver = new ReceiverLink(_session, "client-command-recv-link", "command");
             _dataReceiver.Start(50, OnCommandMessage);
 
             RequestDeviceConfiguration();
         }
 
+        private void RequestDeviceConfiguration()
+        {
+            var device = new EasClientDeviceInformation();
+            var deviceName = device.FriendlyName;
+            var deviceConfigRequest = new DeviceConfigRequest() {DeviceName = deviceName};
+
+            var msg = new Message(JsonConvert.SerializeObject(deviceConfigRequest))
+                      {
+                          Properties = new Properties() {ReplyTo = DeviceConfigReplyTo}
+                      };
+            _deviceConfigSender.Send(msg);
+        }
+
         private void OnDeviceConfigReceive(ReceiverLink receiver, Message message)
         {
-            Debug.WriteLine(TraceLevel.Information, "Received device config response: " + message.Body);
+            Debug.WriteLine("Received device config response: " + message.Body);
             var deviceConfigResponse = JsonConvert.DeserializeObject<DeviceConfigResponse>((string) message.Body);
 
             if (deviceConfigResponse.LedOnOffSwitches != null)
@@ -65,19 +78,6 @@ namespace IotActor
                     var result = _dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => _ledOnOffSwitches.Add(led));
                 }
             }
-        }
-
-        private void RequestDeviceConfiguration()
-        {
-            var device = new EasClientDeviceInformation();
-            var deviceName = device.FriendlyName;
-            var deviceConfigRequest = new DeviceConfigRequest() {DeviceName = deviceName};
-
-            var msg = new Message(JsonConvert.SerializeObject(deviceConfigRequest))
-                      {
-                          Properties = new Properties() {ReplyTo = "device_config_reply"}
-                      };
-            _deviceConfigSender.Send(msg);
         }
 
         private void OnCommandMessage(ReceiverLink receiverLink, Message message)
