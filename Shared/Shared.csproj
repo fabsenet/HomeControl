@@ -37,6 +37,10 @@
     <!-- A reference to the entire .NET Framework is automatically included -->
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Model\DeviceConfigRequest.cs" />
+    <Compile Include="Model\DeviceConfigResponse.cs" />
+    <Compile Include="Model\LedOnOffSetStateCommand.cs" />
+    <Compile Include="Model\LedOnOffSwitchConfiguration.cs" />
     <Compile Include="Model\PingModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

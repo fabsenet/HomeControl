@@ -94,10 +94,12 @@
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AmqpEndpointController.cs" />
+    <Compile Include="AmqpClientEndpointController.cs" />
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Config.cs" />
+    <None Include="Config.Sample.cs" />
     <Compile Include="ILedOnOffSwitch.cs" />
     <Compile Include="LedOnOffSwitch.cs" />
     <Compile Include="MainPage.xaml.cs">
@@ -137,6 +139,12 @@
     <SDKReference Include="WindowsIoT, Version=10.0.10240.0">
       <Name>Windows IoT Extensions for the UWP</Name>
     </SDKReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Shared\Shared.csproj">
+      <Project>{EC1AE3EC-4916-4E58-A5E4-BE7979BE573D}</Project>
+      <Name>Shared</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

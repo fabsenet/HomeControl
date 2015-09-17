@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Configuration;
 using System.ServiceProcess;
+using System.Threading.Tasks;
 using Amqp;
+using Amqp.Framing;
 using Amqp.Listener;
+using Amqp.Types;
 using Serilog;
 
 namespace HomeControl.CentralService
@@ -26,10 +29,13 @@ namespace HomeControl.CentralService
             Uri addressUri = new Uri(ConfigurationManager.ConnectionStrings["AMQP"].ConnectionString);
             _host = new ContainerHost(new Uri[] { addressUri }, null, addressUri.UserInfo);
             _host.Open();
+            
            _log.Information("Container host is listening on {Host}:{Port}", addressUri.Host, addressUri.Port);
 
-            _host.RegisterMessageProcessor("message_processor", new MessageProcessor());
-            _host.RegisterRequestProcessor("request_processor", new RequestProcessor());
+            //_host.RegisterMessageProcessor("message_processor", new MessageProcessor());
+            //_host.RegisterRequestProcessor("request_processor", new RequestProcessor());
+            _host.RegisterRequestProcessor("device_config", new DeviceConfigProcessor());
+            _host.RegisterLinkProcessor(new LinkProcessor());
             _log.Verbose("Finished handler registration.");
         }
 
@@ -48,42 +54,110 @@ namespace HomeControl.CentralService
         }
     }
 
-    class MessageProcessor : IMessageProcessor
+    //class MessageProcessor : IMessageProcessor
+    //{
+    //    private readonly ILogger _log;
+
+    //    public MessageProcessor()
+    //    {
+    //        _log = Log.ForContext<MessageProcessor>();
+    //    }
+
+    //    int IMessageProcessor.Credit
+    //    {
+    //        get { return 300; }
+    //    }
+
+    //    void IMessageProcessor.Process(MessageContext messageContext)
+    //    {
+    //        _log.Verbose("Received message {@message}", messageContext.Message);
+
+    //        messageContext.Complete();
+    //    }
+    //}
+
+    //class RequestProcessor : IRequestProcessor
+    //{
+    //    private readonly ILogger _log;
+    //    public RequestProcessor()
+    //    {
+    //        _log = Log.ForContext<RequestProcessor>();
+    //    }
+
+    //    public void Process(RequestContext requestContext)
+    //    {
+    //        _log.Verbose("Received message {@message}", requestContext.Message);
+
+    //        Message response = new Message("welcome");
+    //        requestContext.Complete(response);
+    //    }
+    //}
+
+
+    class LinkProcessor : ILinkProcessor
     {
-        private readonly ILogger _log;
-
-        public MessageProcessor()
+        public void Process(AttachContext attachContext)
         {
-            _log = Log.ForContext<MessageProcessor>();
+            // start a task to process this request
+            var task = this.ProcessAsync(attachContext);
         }
 
-        int IMessageProcessor.Credit
+        async Task ProcessAsync(AttachContext attachContext)
         {
-            get { return 300; }
-        }
+            // simulating an async operation required to complete the task
+            await Task.Delay(100);
 
-        void IMessageProcessor.Process(MessageContext messageContext)
-        {
-            _log.Verbose("Received message {@message}", messageContext.Message);
-
-            messageContext.Complete();
+            if (attachContext.Attach.LinkName == "")
+            {
+                // how to fail the attach request
+                attachContext.Complete(new Error() { Condition = ErrorCode.InvalidField, Description = "Empty link name not allowed." });
+            }
+            else if (attachContext.Link.Role)
+            {
+                attachContext.Complete(new IncomingLinkEndpoint(), 300);
+            }
+            else
+            {
+                attachContext.Complete(new OutgoingLinkEndpoint(), 0);
+            }
         }
     }
 
-    class RequestProcessor : IRequestProcessor
+    class IncomingLinkEndpoint : LinkEndpoint
     {
-        private readonly ILogger _log;
-        public RequestProcessor()
+        public override void OnMessage(MessageContext messageContext)
         {
-            _log = Log.ForContext<RequestProcessor>();
+            // this can also be done when an async operation, if required, is done
+            messageContext.Complete();
         }
 
-        void IRequestProcessor.Process(RequestContext requestContext)
+        public override void OnFlow(FlowContext flowContext)
         {
-            _log.Verbose("Received message {@message}", requestContext.Message);
+        }
 
-            Message response = new Message("welcome");
-            requestContext.Complete(response);
+        public override void OnDisposition(DispositionContext dispositionContext)
+        {
+        }
+    }
+
+    class OutgoingLinkEndpoint : LinkEndpoint
+    {
+        public override void OnFlow(FlowContext flowContext)
+        {
+            for (int i = 0; i < flowContext.Messages; i++)
+            {
+                var message = new Message("Hello!");
+                message.Properties = new Properties() { Subject = "Welcome Message" };
+                flowContext.Link.SendMessage(message, null);
+            }
+        }
+
+        public override void OnDisposition(DispositionContext dispositionContext)
+        {
+            if (!dispositionContext.Settled)
+            {
+                dispositionContext.Link.DisposeMessage(dispositionContext.Message, new Accepted(), true);
+            }
         }
     }
 }

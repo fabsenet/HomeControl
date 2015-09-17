@@ -3,7 +3,7 @@
   "version": 1,
   "targets": {
     "UAP,Version=v10.0": {
-      "AMQPNetLite/1.1.1": {
+      "AMQPNetLite/1.1.2": {
         "compile": {
           "lib/windows8/Amqp.Store.dll": {}
         },
@@ -207,6 +207,14 @@
         },
         "runtime": {
           "lib/dotnet/Microsoft.Win32.Primitives.dll": {}
+        }
+      },
+      "Newtonsoft.Json/7.0.1": {
+        "compile": {
+          "lib/portable-net45+wp80+win8+wpa81+dnxcore50/Newtonsoft.Json.dll": {}
+        },
+        "runtime": {
+          "lib/portable-net45+wp80+win8+wpa81+dnxcore50/Newtonsoft.Json.dll": {}
         }
       },
       "System.AppContext/4.0.0": {
@@ -1546,7 +1554,7 @@
       }
     },
     "UAP,Version=v10.0/win10-arm": {
-      "AMQPNetLite/1.1.1": {
+      "AMQPNetLite/1.1.2": {
         "compile": {
           "lib/windows8/Amqp.Store.dll": {}
         },
@@ -1793,6 +1801,14 @@
         },
         "runtime": {
           "lib/dotnet/Microsoft.Win32.Primitives.dll": {}
+        }
+      },
+      "Newtonsoft.Json/7.0.1": {
+        "compile": {
+          "lib/portable-net45+wp80+win8+wpa81+dnxcore50/Newtonsoft.Json.dll": {}
+        },
+        "runtime": {
+          "lib/portable-net45+wp80+win8+wpa81+dnxcore50/Newtonsoft.Json.dll": {}
         }
       },
       "System.AppContext/4.0.0": {
@@ -3179,7 +3195,7 @@
       }
     },
     "UAP,Version=v10.0/win10-arm-aot": {
-      "AMQPNetLite/1.1.1": {
+      "AMQPNetLite/1.1.2": {
         "compile": {
           "lib/windows8/Amqp.Store.dll": {}
         },
@@ -3412,6 +3428,14 @@
         },
         "runtime": {
           "lib/dotnet/Microsoft.Win32.Primitives.dll": {}
+        }
+      },
+      "Newtonsoft.Json/7.0.1": {
+        "compile": {
+          "lib/portable-net45+wp80+win8+wpa81+dnxcore50/Newtonsoft.Json.dll": {}
+        },
+        "runtime": {
+          "lib/portable-net45+wp80+win8+wpa81+dnxcore50/Newtonsoft.Json.dll": {}
         }
       },
       "System.AppContext/4.0.0": {
@@ -4784,7 +4808,7 @@
       }
     },
     "UAP,Version=v10.0/win10-x86": {
-      "AMQPNetLite/1.1.1": {
+      "AMQPNetLite/1.1.2": {
         "compile": {
           "lib/windows8/Amqp.Store.dll": {}
         },
@@ -5036,6 +5060,14 @@
         },
         "runtime": {
           "lib/dotnet/Microsoft.Win32.Primitives.dll": {}
+        }
+      },
+      "Newtonsoft.Json/7.0.1": {
+        "compile": {
+          "lib/portable-net45+wp80+win8+wpa81+dnxcore50/Newtonsoft.Json.dll": {}
+        },
+        "runtime": {
+          "lib/portable-net45+wp80+win8+wpa81+dnxcore50/Newtonsoft.Json.dll": {}
         }
       },
       "System.AppContext/4.0.0": {
@@ -6422,7 +6454,7 @@
       }
     },
     "UAP,Version=v10.0/win10-x86-aot": {
-      "AMQPNetLite/1.1.1": {
+      "AMQPNetLite/1.1.2": {
         "compile": {
           "lib/windows8/Amqp.Store.dll": {}
         },
@@ -6655,6 +6687,14 @@
         },
         "runtime": {
           "lib/dotnet/Microsoft.Win32.Primitives.dll": {}
+        }
+      },
+      "Newtonsoft.Json/7.0.1": {
+        "compile": {
+          "lib/portable-net45+wp80+win8+wpa81+dnxcore50/Newtonsoft.Json.dll": {}
+        },
+        "runtime": {
+          "lib/portable-net45+wp80+win8+wpa81+dnxcore50/Newtonsoft.Json.dll": {}
         }
       },
       "System.AppContext/4.0.0": {
@@ -8027,7 +8067,7 @@
       }
     },
     "UAP,Version=v10.0/win10-x64": {
-      "AMQPNetLite/1.1.1": {
+      "AMQPNetLite/1.1.2": {
         "compile": {
           "lib/windows8/Amqp.Store.dll": {}
         },
@@ -8279,6 +8319,14 @@
         },
         "runtime": {
           "lib/dotnet/Microsoft.Win32.Primitives.dll": {}
+        }
+      },
+      "Newtonsoft.Json/7.0.1": {
+        "compile": {
+          "lib/portable-net45+wp80+win8+wpa81+dnxcore50/Newtonsoft.Json.dll": {}
+        },
+        "runtime": {
+          "lib/portable-net45+wp80+win8+wpa81+dnxcore50/Newtonsoft.Json.dll": {}
         }
       },
       "System.AppContext/4.0.0": {
@@ -9665,7 +9713,7 @@
       }
     },
     "UAP,Version=v10.0/win10-x64-aot": {
-      "AMQPNetLite/1.1.1": {
+      "AMQPNetLite/1.1.2": {
         "compile": {
           "lib/windows8/Amqp.Store.dll": {}
         },
@@ -9898,6 +9946,14 @@
         },
         "runtime": {
           "lib/dotnet/Microsoft.Win32.Primitives.dll": {}
+        }
+      },
+      "Newtonsoft.Json/7.0.1": {
+        "compile": {
+          "lib/portable-net45+wp80+win8+wpa81+dnxcore50/Newtonsoft.Json.dll": {}
+        },
+        "runtime": {
+          "lib/portable-net45+wp80+win8+wpa81+dnxcore50/Newtonsoft.Json.dll": {}
         }
       },
       "System.AppContext/4.0.0": {
@@ -11271,8 +11327,8 @@
     }
   },
   "libraries": {
-    "AMQPNetLite/1.1.1": {
-      "sha512": "tY/oN9s81eC6rEhu7GMx1v2MNDdfwxr8tzheg76afYxzxkn/Fmw6QSlT7SnHjDVkYo95RWUienZwC9IuNBh/qg==",
+    "AMQPNetLite/1.1.2": {
+      "sha512": "SFenW4KHVkidIhPcE1LGAYBRSQrsPS8/0nwLDew59VHP7ZEp0jHFAkoWE44bHckx2ZsJbt+SjxZyUo6iAZIa8w==",
       "type": "Package",
       "files": [
         "_rels/.rels",
@@ -11308,7 +11364,7 @@
         "lib/portable-netcore451+wpa81/Amqp.NetCore.dll",
         "lib/portable-netcore451+wpa81/Amqp.NetCore.pdb",
         "lib/portable-netcore451+wpa81/Amqp.NetCore.pri",
-        "package/services/metadata/core-properties/c8557213e5354715a4ca2e7c56726890.psmdcp",
+        "package/services/metadata/core-properties/0902e422df2a44709226e9708ee3cb9f.psmdcp",
         "[Content_Types].xml"
       ]
     },
@@ -11962,6 +12018,29 @@
         "ref/xamarinios10/_._",
         "ref/xamarinmac20/_._",
         "package/services/metadata/core-properties/1d4eb9d0228b48b88d2df3822fba2d86.psmdcp",
+        "[Content_Types].xml"
+      ]
+    },
+    "Newtonsoft.Json/7.0.1": {
+      "sha512": "q3V4KLetMLnt1gpAVWgtXnHjKs0UG/RalBc29u2ZKxd5t5Ze4JBL5WiiYIklJyK/5CRiIiNwigVQUo0FgbsuWA==",
+      "type": "Package",
+      "files": [
+        "_rels/.rels",
+        "Newtonsoft.Json.nuspec",
+        "lib/net20/Newtonsoft.Json.dll",
+        "lib/net20/Newtonsoft.Json.xml",
+        "lib/net35/Newtonsoft.Json.dll",
+        "lib/net35/Newtonsoft.Json.xml",
+        "lib/net40/Newtonsoft.Json.dll",
+        "lib/net40/Newtonsoft.Json.xml",
+        "lib/net45/Newtonsoft.Json.dll",
+        "lib/net45/Newtonsoft.Json.xml",
+        "lib/portable-net40+sl5+wp80+win8+wpa81/Newtonsoft.Json.dll",
+        "lib/portable-net40+sl5+wp80+win8+wpa81/Newtonsoft.Json.xml",
+        "lib/portable-net45+wp80+win8+wpa81+dnxcore50/Newtonsoft.Json.dll",
+        "lib/portable-net45+wp80+win8+wpa81+dnxcore50/Newtonsoft.Json.xml",
+        "tools/install.ps1",
+        "package/services/metadata/core-properties/49e907fc018c4c7ab632e6d4ad4766f8.psmdcp",
         "[Content_Types].xml"
       ]
     },
@@ -14663,8 +14742,9 @@
   },
   "projectFileDependencyGroups": {
     "": [
-      "AMQPNetLite >= 1.1.1",
-      "Microsoft.NETCore.UniversalWindowsPlatform >= 5.0.0"
+      "AMQPNetLite >= 1.1.2",
+      "Microsoft.NETCore.UniversalWindowsPlatform >= 5.0.0",
+      "Newtonsoft.Json >= 7.0.1"
     ],
     "UAP,Version=v10.0": []
   }
