@@ -51,25 +51,36 @@ namespace HomeControl.CentralService
 
             Message responseMsg = new Message(JsonConvert.SerializeObject(response));
             _log.Verbose("Replying with {@message}", responseMsg);
-            requestContext.Complete(responseMsg);
 
-            //Task.Delay(1000).ContinueWith((_) =>
-            //                              {
-            //                                  _log.Information("Sending led on off command!");
-            //                                  var command = new LedOnOffSetStateCommand()
-            //                                  {
-            //                                      PinNumber = 18,
-            //                                      DesiredState = true
-            //                                  };
-            //                                  var msg = new Message(JsonConvert.SerializeObject(command))
-            //                                  {
-            //                                      ApplicationProperties = new ApplicationProperties()
-            //                                      {
-            //                                          ["CommandType"] = nameof(LedOnOffSetStateCommand)
-            //                                      }
-            //                                  };
-            //                                  requestContext.Link.SendMessage(msg, new ByteBuffer(10000, true));
-            //                              });
+            var link = requestContext.Link;
+
+            //requestContext.Complete(responseMsg);
+            link.SendMessage(responseMsg, null);
+
+            Task.Delay(1000).ContinueWith((_) =>
+                                          {
+                                              for (int i = 0; i < 200; i++)
+                                              {
+                                                  Task.Delay(1000).Wait();
+                                                  _log.Information("Sending led on off command! Number {number}", i);
+                                                  var command = new LedOnOffSetStateCommand()
+                                                                {
+                                                                    PinNumber = 18,
+                                                                    DesiredState = i%2==0
+                                                                };
+                                                  var commandJson = JsonConvert.SerializeObject(command);
+
+                                                  var msg = new Message(commandJson)
+                                                            {
+                                                                ApplicationProperties = new ApplicationProperties()
+                                                                                        {
+                                                                                            ["CommandType"] = nameof(LedOnOffSetStateCommand)
+                                                                                        }
+                                                            };
+
+                                                  link.SendMessage(msg, null); //<== throws AmqpException: Operation is not valid due to the current state of the object.
+                                              }
+                                          });
         }
     }
 }
