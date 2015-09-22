@@ -18,7 +18,7 @@ namespace Web
 
         public override IController CreateController(RequestContext requestContext, string controllerName)
             {
-                if (controllerName == nameof(HomeController).Replace("Controller", ""))
+                if (nameof(HomeController).Replace("Controller", "").Equals(controllerName, StringComparison.OrdinalIgnoreCase) )
                 {
                     // ... then create a new controller and set up the dependency
                     return new HomeController(_documentStore);

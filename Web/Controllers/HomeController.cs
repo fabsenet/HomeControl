@@ -32,5 +32,11 @@ namespace Web.Controllers
                 return View(model);
             }
         }
+
+        [LogAction]
+        public ActionResult TestSignalr()
+        {
+            return View();
+        }
     }
 }

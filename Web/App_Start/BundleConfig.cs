@@ -23,6 +23,11 @@ namespace Web
                       "~/Scripts/bootstrap.js",
                       "~/Scripts/respond.js"));
 
+            bundles.Add(new ScriptBundle("~/bundles/js")
+                .Include("~/Scripts/jquery-{version}.js")
+                .Include("~/Scripts/bootstrap.js", "~/Scripts/respond.js")
+                .Include("~/Scripts/jquery.signalR-2.2.0.js"));
+
             bundles.Add(new StyleBundle("~/Content/css").Include(
                       "~/Content/bootstrap.css",
                       "~/Content/site.css"));
