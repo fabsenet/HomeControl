@@ -1,4 +1,0 @@
-﻿<connectionStrings>
-  <add name="SerilogRavenDB" connectionString="****YOUR RAVENDB CONNECTIONSTRING HERE***" />
-  <add name="AMQP" connectionString="****YOUR AMQP ENDPOINT URI****" />
-</connectionStrings>
