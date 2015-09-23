@@ -8,7 +8,7 @@ namespace IotActor
 {
     public sealed partial class MainPage : Page
     {
-        private AmqpClientEndpointController _controller;
+        private SignalrClientEndpointController _controller;
 
         private readonly ObservableCollection<LedOnOffSwitch> _ledOnOffSwitches = new ObservableCollection<LedOnOffSwitch>();
         private Task _ledSwitchingTask;
@@ -18,7 +18,7 @@ namespace IotActor
         {
             this.InitializeComponent();
 
-            Task.Delay(2000).ContinueWith(task => _controller = new AmqpClientEndpointController(_ledOnOffSwitches, Dispatcher));
+            Task.Delay(4000).ContinueWith(task => _controller = new SignalrClientEndpointController(_ledOnOffSwitches, Dispatcher));
 
 
             DataContext = _ledOnOffSwitches;

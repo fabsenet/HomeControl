@@ -94,7 +94,7 @@
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AmqpClientEndpointController.cs" />
+    <Compile Include="SignalrClientEndpointController.cs" />
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
