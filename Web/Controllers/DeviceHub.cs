@@ -14,19 +14,7 @@ namespace Web.Controllers
         {
             Debug.WriteLine("received hello: "+deviceName);
 
-            SendMsgs(Clients.Caller);
-            //Clients.Caller.configure("led on pin 18!");
-        }
-
-        private async Task SendMsgs(dynamic caller)
-        {
-            for (int i = 0; i < 100; i++)
-            {
-                await Task.Delay(TimeSpan.FromSeconds(1));
-
-                caller.configure("led on pin 18!");
-                caller.Configure("led on pin 18!");
-            }
+            Clients.Caller.Configure("led on pin 18!");
         }
 
         public override Task OnConnected()
