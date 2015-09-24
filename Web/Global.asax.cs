@@ -20,16 +20,6 @@ namespace Web
             ConfigureLogging();
 
 
-            var documentStore = new DocumentStore { ConnectionStringName = "HomeControlDB" }.Initialize();
-
-            AreaRegistration.RegisterAllAreas();
-
-            ControllerBuilder.Current.SetControllerFactory(new MvcConfig(documentStore));
-            GlobalConfiguration.Configure(new WebApiConfig(documentStore).Register);
-
-            FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
-            RouteConfig.RegisterRoutes(RouteTable.Routes);
-            BundleConfig.RegisterBundles(BundleTable.Bundles);
 
         }
 

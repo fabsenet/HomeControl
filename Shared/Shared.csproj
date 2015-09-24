@@ -41,7 +41,7 @@
     <Compile Include="Model\DeviceConfigResponse.cs" />
     <Compile Include="Model\LedOnOffSetStateCommand.cs" />
     <Compile Include="Model\LedOnOffSwitchConfiguration.cs" />
-    <Compile Include="Model\PingModel.cs" />
+    <Compile Include="Model\PingResponse.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />

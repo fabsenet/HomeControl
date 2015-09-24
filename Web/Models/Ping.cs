@@ -11,7 +11,9 @@ namespace Web.Models
 
         public DateTime LastOnlineTime { get; set; }
 
+        public bool IsCurrentlyOnline { get; set; }
+
         [JsonIgnore]
-        public bool ConsideredOnline => LastOnlineTime + TimeSpan.FromMinutes(3) > DateTime.UtcNow;
+        public bool ConsideredOnline => IsCurrentlyOnline && LastOnlineTime + TimeSpan.FromMinutes(10) > DateTime.UtcNow;
     }
 }

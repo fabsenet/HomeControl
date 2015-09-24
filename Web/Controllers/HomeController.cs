@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using HomeControl.Shared.Model;
+using Microsoft.AspNet.SignalR;
+using Newtonsoft.Json;
 using Raven.Client;
 using Serilog;
 using Web.Models;
@@ -10,7 +13,7 @@ using Web.Models;
 namespace Web.Controllers
 {
     [RequireHttps]
-    [Authorize]
+    [System.Web.Mvc.Authorize]
     public class HomeController : Controller
     {
         private readonly IDocumentStore _documentStore;
@@ -37,6 +40,15 @@ namespace Web.Controllers
         public ActionResult TestSignalr()
         {
             return View();
+        }
+
+        public ActionResult SetLight(string deviceName, bool desiredState)
+        {
+            var deviceHub = GlobalHost.ConnectionManager.GetHubContext<DeviceHub>();
+            var command = new LedOnOffSetStateCommand() {DesiredState = desiredState, PinNumber = 18};
+            deviceHub.Clients.All.ledOnOffSetStateCommand(JsonConvert.SerializeObject(command));
+
+            return RedirectToAction("Index");
         }
     }
 }

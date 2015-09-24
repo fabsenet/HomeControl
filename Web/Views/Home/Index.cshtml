@@ -32,7 +32,8 @@
                     <td><span title="@ping.LastOnlineTime.ToLocalTime()">@ping.LastOnlineTime.Humanize()</span></td>
                     <td>@if (ping.ConsideredOnline)
                         {
-                            <button class="btn btn-danger">Herunterfahren</button>
+                            @Html.ActionLink("Licht an", "SetLight", new {DeviceName=ping.Hostname,DesiredState=true}, new {@class="btn btn-success"})
+                            @Html.ActionLink("Licht aus", "SetLight", new {DeviceName=ping.Hostname,DesiredState=false}, new {@class="btn btn-danger"})
                         }</td>
                 </tr>
             }

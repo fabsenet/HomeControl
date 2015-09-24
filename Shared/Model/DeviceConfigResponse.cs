@@ -1,9 +1,15 @@
+using System;
 using System.Collections.Generic;
 
 namespace HomeControl.Shared.Model
 {
     public class DeviceConfigResponse
     {
-        public List<LedOnOffSwitchConfiguration> LedOnOffSwitches { get; set; } 
+        public DeviceConfigResponse()
+        {
+            LedOnOffSwitches = new List<LedOnOffSwitchConfiguration>();
+        }
+        public List<LedOnOffSwitchConfiguration> LedOnOffSwitches { get; private set; }
+        public TimeSpan? ApplicationlevelPingTimeSpan { get; set; }
     }
 }

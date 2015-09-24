@@ -4,12 +4,14 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Net.Http;
 using System.Threading;
+using System.Threading.Tasks;
 using Windows.Security.ExchangeActiveSyncProvisioning;
 using Windows.UI.Core;
 using HomeControl.Shared.Model;
 using Microsoft.AspNet.SignalR.Client;
 using Microsoft.AspNet.SignalR.Client.Http;
 using Newtonsoft.Json;
+using Polly;
 
 namespace IotActor
 {
@@ -24,6 +26,8 @@ namespace IotActor
         private readonly IHubProxy _hubProxy;
         private readonly HubConnection _hubConnection;
 
+        private readonly Policy _policy = Policy.Handle<Exception>().RetryForever(ex => Task.Delay(1000).Wait());
+
         public SignalrClientEndpointController(ObservableCollection<LedOnOffSwitch> ledOnOffSwitches, CoreDispatcher dispatcher)
         {
             _ledOnOffSwitches = ledOnOffSwitches;
@@ -34,10 +38,21 @@ namespace IotActor
 
             _hubConnection.Received += msg => Debug.WriteLine("Received from HubConnection: " + msg);
 
-            _hubProxy.On<string>("Configure", (message) => Debug.WriteLine(String.Format("MsgName: {0}, Message: {1}", null, message)));
-            _hubConnection.Start().Wait();
+            _hubProxy.On<string>("Configure", (message) => OnDeviceConfigReceive(JsonConvert.DeserializeObject<DeviceConfigResponse>(message)));
+            _hubProxy.On<string>("LedOnOffSetStateCommand", (message) => OnLedOnOffSetStateCommand(JsonConvert.DeserializeObject<LedOnOffSetStateCommand>(message)));
+
+            _policy.Execute(() => _hubConnection.Start().Wait());
 
             RequestDeviceConfiguration();
+        }
+
+        private void OnLedOnOffSetStateCommand(LedOnOffSetStateCommand ledOnOffSetStateCommand)
+        {
+            LedOnOffSwitch led;
+            if (_leds.TryGetValue(ledOnOffSetStateCommand.PinNumber, out led))
+            {
+                led.SetState(ledOnOffSetStateCommand.DesiredState);
+            }
         }
 
         private void RequestDeviceConfiguration()
@@ -49,7 +64,7 @@ namespace IotActor
 
         }
 
-        private static string DeviceName
+        private string DeviceName
         {
             get
             {
@@ -59,23 +74,56 @@ namespace IotActor
             }
         }
 
-        //private void OnDeviceConfigReceive(ReceiverLink receiver, Message message)
-        //{
-        //    Debug.WriteLine("Received device config response: " + message.Body);
-        //    var deviceConfigResponse = JsonConvert.DeserializeObject<DeviceConfigResponse>((string) message.Body);
+        private Task _pingTask;
 
-        //    if (deviceConfigResponse.LedOnOffSwitches != null)
-        //    {
-        //        foreach (var ledOnOffSwitchConfiguration in deviceConfigResponse.LedOnOffSwitches)
-        //        {
-        //            var led = new LedOnOffSwitch(ledOnOffSwitchConfiguration.PinNumber, _token.Token, _dispatcher);
-        //            led.SetState(ledOnOffSwitchConfiguration.InitialState);
-        //            _leds[ledOnOffSwitchConfiguration.PinNumber] = led;
-        //            var result = _dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => _ledOnOffSwitches.Add(led));
-        //        }
-        //    }
-        //}
-        
+        private void OnDeviceConfigReceive(DeviceConfigResponse deviceConfigResponse)
+        {
+            Debug.WriteLine("Received device config response: " + deviceConfigResponse);
+
+            if (deviceConfigResponse.LedOnOffSwitches != null)
+            {
+                foreach (var ledOnOffSwitchConfiguration in deviceConfigResponse.LedOnOffSwitches)
+                {
+                    var led = new LedOnOffSwitch(ledOnOffSwitchConfiguration.PinNumber, _token.Token, _dispatcher);
+                    led.SetState(ledOnOffSwitchConfiguration.InitialState);
+                    _leds[ledOnOffSwitchConfiguration.PinNumber] = led;
+                    var result = _dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => _ledOnOffSwitches.Add(led));
+                }
+            }
+            if (deviceConfigResponse.ApplicationlevelPingTimeSpan != null)
+            {
+                _pingTask = PingContiniously(deviceConfigResponse.ApplicationlevelPingTimeSpan.Value);
+            }
+        }
+
+        private async Task PingContiniously(TimeSpan interval)
+        {
+            while (true)
+            {
+                await Task.Delay(interval);
+
+                _policy.Execute(() => SendOnePing().Wait());
+            }
+        }
+
+        private async Task SendOnePing()
+        {
+            try
+            {
+                var pingResponse = new PingResponse()
+                                            {
+                                                HostName = DeviceName,
+                                                PingTime = DateTime.UtcNow
+                                            };
+
+                await _hubProxy.Invoke("PingResponse", JsonConvert.SerializeObject(pingResponse));
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Ping failed: "+ex);
+                throw;
+            }
+        }
     }
 
     class MyHttpClient : DefaultHttpClient
