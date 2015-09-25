@@ -1,11 +1,12 @@
-﻿@model Web.Models.HomeControllerIndexModel
+﻿@using Humanizer
+@model Web.Models.HomeControllerIndexModel
 @{
     ViewBag.Title = "Home Page";
 }
 
 <div class="row">
     <div class="col-md-6">
-        <h2>Onlinestatus</h2>
+        <h2>Online</h2>
         <table class="table table-hover table-responsive table-striped">
             <thead>
             <tr>
@@ -15,11 +16,11 @@
             </tr>
             </thead>
             <tbody>
-            @foreach (var ping in Model.Pings)
+            @foreach (var deviceConfig in Model.DeviceConfigsOnline)
             {
                 <tr>
-                    <td>@ping.Hostname</td>
-                    <td>@if (ping.ConsideredOnline)
+                    <td>@deviceConfig.Hostname</td>
+                    <td>@if (deviceConfig.ConsideredOnline)
                         {
                             <span class="label label-success">online</span>
                         }
@@ -27,11 +28,33 @@
                         {
                             <span class="label label-danger">offline</span>
                         }</td>
-                    <td>@if (ping.ConsideredOnline)
+                    <td>@if (deviceConfig.ConsideredOnline)
                         {
-                            @Html.ActionLink("Licht an", "SetLight", new {DeviceName=ping.Hostname,DesiredState=true}, new {@class="btn btn-success"})
-                            @Html.ActionLink("Licht aus", "SetLight", new {DeviceName=ping.Hostname,DesiredState=false}, new {@class="btn btn-danger"})
+                            @Html.ActionLink("Licht an", "SetLight", new {DeviceName=deviceConfig.Hostname,DesiredState=true}, new {@class="btn btn-success"})
+                            @Html.ActionLink("Licht aus", "SetLight", new {DeviceName=deviceConfig.Hostname,DesiredState=false}, new {@class="btn btn-danger"})
                         }</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+    <div class="col-md-6">
+        <h2 class="label label-danger">Offline</h2>
+        <table class="table table-hover table-responsive table-striped">
+            <thead>
+            <tr>
+                <th>Gerät</th>
+                <th>Zuletzt Online</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var deviceConfig in Model.DeviceConfigsOnline)
+            {
+                <tr>
+                    <td>@deviceConfig.Hostname</td>
+                    <td>
+                        @deviceConfig.LastOnlineTime.Humanize()
+                    </td>
                 </tr>
             }
             </tbody>

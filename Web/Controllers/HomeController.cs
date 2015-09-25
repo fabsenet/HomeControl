@@ -28,10 +28,20 @@ namespace Web.Controllers
         {
             using (var session = _documentStore.OpenSession())
             {
+                var allDeviceConfigs = session.Query<DeviceConfig>()
+                    .OrderByDescending(p => p.LastOnlineTime)
+                    .ToList();
                 var model = new HomeControllerIndexModel()
-                {
-                    Pings = session.Query<DeviceConfig>().OrderByDescending(p => p.LastOnlineTime).ToList()
-                };
+                            {
+                                DeviceConfigsOnline = allDeviceConfigs
+                                    .Where(d => d.ConsideredOnline)
+                                    .OrderBy(p => p.Hostname)
+                                    .ToList(),
+                                DeviceConfigsOffline = allDeviceConfigs
+                                    .Where(d => !d.ConsideredOnline)
+                                    .OrderByDescending(p => p.LastOnlineTime)
+                                    .ToList(),
+                            };
                 return View(model);
             }
         }

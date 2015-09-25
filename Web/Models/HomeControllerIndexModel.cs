@@ -7,6 +7,7 @@ namespace Web.Models
 {
     public class HomeControllerIndexModel
     {
-        public IList<DeviceConfig> Pings { get; set; }
+        public IList<DeviceConfig> DeviceConfigsOnline { get; set; }
+        public IList<DeviceConfig> DeviceConfigsOffline { get; set; }
     }
 }
