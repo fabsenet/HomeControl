@@ -47,10 +47,10 @@ namespace Web.Controllers
             using (var session = _documentStore.OpenSession())
             {
                 var pingId = "Pings/" + deviceName;
-                var ping = session.Load<Ping>(pingId);
+                var ping = session.Load<DeviceConfig>(pingId);
                 if (ping == null)
                 {
-                    ping = new Ping { Id = pingId, Hostname = deviceName };
+                    ping = new DeviceConfig { Id = pingId, Hostname = deviceName };
                     session.Store(ping);
                 }
 
@@ -65,7 +65,7 @@ namespace Web.Controllers
             using (var session = _documentStore.OpenSession())
             {
                 var pingId = "Pings/" + deviceName;
-                var ping = session.Load<Ping>(pingId);
+                var ping = session.Load<DeviceConfig>(pingId);
 
                 if (ping == null) return;
                 

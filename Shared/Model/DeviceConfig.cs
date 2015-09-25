@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using Raven.Imports.Newtonsoft.Json;
 
-namespace Web.Models
+namespace HomeControl.Shared.Model
 {
-    public class Ping
+    public class DeviceConfig
     {
         public string Id { get; set; }
 
@@ -15,5 +16,11 @@ namespace Web.Models
 
         [JsonIgnore]
         public bool ConsideredOnline => IsCurrentlyOnline && LastOnlineTime + TimeSpan.FromMinutes(10) > DateTime.UtcNow;
+
+        public Dictionary<int,bool> LedStatesByPinNumber { get; set; }=new Dictionary<int, bool>();
+
+        public List<LedOnOffSwitchConfiguration> LedOnOffSwitchConfigurations { get; set; } = new List<LedOnOffSwitchConfiguration>();
+
+        public bool PowerStateControllable { get; set; }
     }
 }

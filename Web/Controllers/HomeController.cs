@@ -30,7 +30,7 @@ namespace Web.Controllers
             {
                 var model = new HomeControllerIndexModel()
                 {
-                    Pings = session.Query<Ping>().OrderByDescending(p => p.LastOnlineTime).ToList()
+                    Pings = session.Query<DeviceConfig>().OrderByDescending(p => p.LastOnlineTime).ToList()
                 };
                 return View(model);
             }

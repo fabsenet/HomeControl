@@ -179,13 +179,11 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\LogAction.cs" />
     <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="Controllers\PingController.cs" />
     <Compile Include="Controllers\DeviceHub.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\HomeControllerIndexModel.cs" />
-    <Compile Include="Models\Ping.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
@@ -275,7 +273,7 @@
     <VisualStudio>
       <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
         <WebProjectProperties>
-          <UseIIS>True</UseIIS>
+          <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>56940</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>

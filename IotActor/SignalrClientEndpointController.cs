@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,7 +18,6 @@ namespace IotActor
 {
     public class SignalrClientEndpointController
     {
-        private const string DeviceConfigReplyTo = "device_config_reply";
         private readonly ObservableCollection<LedOnOffSwitch> _ledOnOffSwitches;
         private readonly CoreDispatcher _dispatcher;
 
@@ -34,12 +34,21 @@ namespace IotActor
             _dispatcher = dispatcher;
 
             _hubConnection = new HubConnection(Config.SignalrHubUrl);
+
+            if (!string.IsNullOrEmpty(Config.SignalrHubUserName))
+            {
+                _hubConnection.Credentials = new NetworkCredential(Config.SignalrHubUserName, Config.SignalrHubPassword);
+            }
+
+            //endlessly try to reconnect
+            _hubConnection.Closed += () => _policy.Execute(() => _hubConnection.Start().Wait());
+
             _hubProxy = _hubConnection.CreateHubProxy("DeviceHub");
 
             _hubConnection.Received += msg => Debug.WriteLine("Received from HubConnection: " + msg);
 
-            _hubProxy.On<string>("Configure", (message) => OnDeviceConfigReceive(JsonConvert.DeserializeObject<DeviceConfigResponse>(message)));
-            _hubProxy.On<string>("LedOnOffSetStateCommand", (message) => OnLedOnOffSetStateCommand(JsonConvert.DeserializeObject<LedOnOffSetStateCommand>(message)));
+            _hubProxy.On<string>("Configure", message => OnDeviceConfigReceive(JsonConvert.DeserializeObject<DeviceConfigResponse>(message)));
+            _hubProxy.On<string>("LedOnOffSetStateCommand", message => OnLedOnOffSetStateCommand(JsonConvert.DeserializeObject<LedOnOffSetStateCommand>(message)));
 
             _policy.Execute(() => _hubConnection.Start().Wait());
 
@@ -74,11 +83,19 @@ namespace IotActor
             }
         }
 
+        private CancellationTokenSource _tokenSource;
         private Task _pingTask;
 
         private void OnDeviceConfigReceive(DeviceConfigResponse deviceConfigResponse)
         {
             Debug.WriteLine("Received device config response: " + deviceConfigResponse);
+
+            if (_tokenSource != null)
+            {
+                //there was an earlier config, rewind it
+                _tokenSource.Cancel();
+            }
+            _tokenSource = new CancellationTokenSource();
 
             if (deviceConfigResponse.LedOnOffSwitches != null)
             {
@@ -92,17 +109,17 @@ namespace IotActor
             }
             if (deviceConfigResponse.ApplicationlevelPingTimeSpan != null)
             {
-                _pingTask = PingContiniously(deviceConfigResponse.ApplicationlevelPingTimeSpan.Value);
+                _pingTask = PingContiniously(deviceConfigResponse.ApplicationlevelPingTimeSpan.Value, _tokenSource.Token);
             }
         }
 
-        private async Task PingContiniously(TimeSpan interval)
+        private async Task PingContiniously(TimeSpan interval, CancellationToken token)
         {
-            while (true)
+            while (!token.IsCancellationRequested)
             {
-                await Task.Delay(interval);
+                await Task.Delay(interval, token);
 
-                _policy.Execute(() => SendOnePing().Wait());
+                _policy.Execute(() => SendOnePing().Wait(token));
             }
         }
 

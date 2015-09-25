@@ -1,5 +1,4 @@
-﻿@using Humanizer
-@model Web.Models.HomeControllerIndexModel
+﻿@model Web.Models.HomeControllerIndexModel
 @{
     ViewBag.Title = "Home Page";
 }
@@ -12,7 +11,6 @@
             <tr>
                 <th>Gerät</th>
                 <th>Onlinestatus</th>
-                <th>Letzter Ping</th>
                 <th></th>
             </tr>
             </thead>
@@ -29,7 +27,6 @@
                         {
                             <span class="label label-danger">offline</span>
                         }</td>
-                    <td><span title="@ping.LastOnlineTime.ToLocalTime()">@ping.LastOnlineTime.Humanize()</span></td>
                     <td>@if (ping.ConsideredOnline)
                         {
                             @Html.ActionLink("Licht an", "SetLight", new {DeviceName=ping.Hostname,DesiredState=true}, new {@class="btn btn-success"})
