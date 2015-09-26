@@ -52,11 +52,20 @@ namespace Web.Controllers
             return View();
         }
 
-        public ActionResult SetLight(string deviceName, bool desiredState)
+        public ActionResult SetLight(string deviceName, bool desiredState, int pinNumber)
         {
-            var deviceHub = GlobalHost.ConnectionManager.GetHubContext<DeviceHub>();
-            var command = new LedOnOffSetStateCommand() {DesiredState = desiredState, PinNumber = 18};
-            deviceHub.Clients.All.ledOnOffSetStateCommand(JsonConvert.SerializeObject(command));
+            var command = new LedOnOffSetStateCommand() {DesiredState = desiredState, PinNumber = pinNumber};
+            DeviceHubContext.Clients.All.ledOnOffSetStateCommand(JsonConvert.SerializeObject(command));
+
+            return RedirectToAction("Index");
+        }
+
+        private static IHubContext DeviceHubContext => GlobalHost.ConnectionManager.GetHubContext<DeviceHub>();
+
+        public ActionResult TransitionPowerState(string devicename, PowerStateEnum desiredPowerState)
+        {
+            var command = new TransitionPowerStateCommand() { DesiredPowerState = desiredPowerState};
+            DeviceHubContext.Clients.All.ledOnOffSetStateCommand(JsonConvert.SerializeObject(command));
 
             return RedirectToAction("Index");
         }

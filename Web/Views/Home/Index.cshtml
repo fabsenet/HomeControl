@@ -1,4 +1,6 @@
-﻿@using Humanizer
+﻿@using HomeControl.Shared.Model
+@using Humanizer
+@using Raven.Abstractions.Extensions
 @model Web.Models.HomeControllerIndexModel
 @{
     ViewBag.Title = "Home Page";
@@ -28,11 +30,24 @@
                         {
                             <span class="label label-danger">offline</span>
                         }</td>
-                    <td>@if (deviceConfig.ConsideredOnline)
+                    <td>@foreach (var ledConfig in deviceConfig.LedOnOffSwitchConfigurations)
                         {
-                            @Html.ActionLink("Licht an", "SetLight", new {DeviceName=deviceConfig.Hostname,DesiredState=true}, new {@class="btn btn-success"})
-                            @Html.ActionLink("Licht aus", "SetLight", new {DeviceName=deviceConfig.Hostname,DesiredState=false}, new {@class="btn btn-danger"})
-                        }</td>
+                            var currentState = deviceConfig.LedStatesByPinNumber.GetOrDefault(ledConfig.PinNumber);
+
+                            @Html.ActionLink(ledConfig.Name, "SetLight"
+                                , new {DeviceName = deviceConfig.Hostname, DesiredState = !currentState, PinNumber = ledConfig.PinNumber}
+                                , new {@class = currentState ? "btn btn-success" : "btn btn-danger" })
+                        }
+                    @if (deviceConfig.PowerStateControllable)
+                    {
+                        @Html.ActionLink("Standby", "TransitionPowerState"
+                       , new { DeviceName = deviceConfig.Hostname, DesiredPowerState = PowerStateEnum.Standby }
+                       , new { @class = "btn btn-warning" })
+
+                        @Html.ActionLink("Shutdown", "TransitionPowerState"
+                       , new {DeviceName = deviceConfig.Hostname, DesiredPowerState = PowerStateEnum.Shutdown }
+                       , new {@class="btn btn-warning"})
+                    }</td>
                 </tr>
             }
             </tbody>

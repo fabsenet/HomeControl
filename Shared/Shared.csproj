@@ -40,6 +40,8 @@
     <Compile Include="Model\LedOnOffSetStateCommand.cs" />
     <Compile Include="Model\LedOnOffSwitchConfiguration.cs" />
     <Compile Include="Model\PingResponse.cs" />
+    <Compile Include="Model\PowerStateEnum.cs" />
+    <Compile Include="Model\TransitionPowerStateCommand.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
