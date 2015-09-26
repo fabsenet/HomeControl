@@ -70,5 +70,13 @@ namespace Web.Controllers
 
             return RedirectToAction("Index");
         }
+
+        private IDeviceHubClient GetClient(string deviceName)
+        {//todo use method
+            var connectionId = DeviceHub.GetConnectionIdForDeviceName(deviceName);
+            if (connectionId == null) return null;
+
+            return DeviceHubContext.Clients.Client(connectionId);
+        }
     }
 }

@@ -25,6 +25,13 @@ namespace Web.Controllers
         }
         private static readonly List<DeviceConnection> _connectedDevices = new List<DeviceConnection>();
 
+        public static string GetConnectionIdForDeviceName(string deviceName)
+        {
+            return _connectedDevices.Where(cd => cd.DeviceName == deviceName)
+                .Select(cd => cd.ConnectionId)
+                .FirstOrDefault();
+        }
+
         private void AddDevice(string deviceName, string connectionId)
         {
             _connectedDevices.RemoveAll(dc => dc.DeviceName == deviceName || dc.ConnectionId == connectionId);
