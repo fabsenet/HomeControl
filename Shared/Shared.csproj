@@ -34,6 +34,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Contract\IDeviceHubClient.cs" />
     <Compile Include="Model\DeviceConfig.cs" />
     <Compile Include="Model\DeviceConfigRequest.cs" />
     <Compile Include="Model\DeviceConfigResponse.cs" />

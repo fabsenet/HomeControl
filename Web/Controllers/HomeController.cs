@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using HomeControl.Shared.Contract;
 using HomeControl.Shared.Model;
 using Microsoft.AspNet.SignalR;
 using Newtonsoft.Json;
@@ -55,17 +56,17 @@ namespace Web.Controllers
         public ActionResult SetLight(string deviceName, bool desiredState, int pinNumber)
         {
             var command = new LedOnOffSetStateCommand() {DesiredState = desiredState, PinNumber = pinNumber};
-            DeviceHubContext.Clients.All.ledOnOffSetStateCommand(JsonConvert.SerializeObject(command));
+            DeviceHubContext.Clients.All.LedOnOffSetStateCommand(JsonConvert.SerializeObject(command));
 
             return RedirectToAction("Index");
         }
 
-        private static IHubContext DeviceHubContext => GlobalHost.ConnectionManager.GetHubContext<DeviceHub>();
+        private static IHubContext<IDeviceHubClient> DeviceHubContext => GlobalHost.ConnectionManager.GetHubContext<DeviceHub, IDeviceHubClient>();
 
         public ActionResult TransitionPowerState(string devicename, PowerStateEnum desiredPowerState)
         {
             var command = new TransitionPowerStateCommand() { DesiredPowerState = desiredPowerState};
-            DeviceHubContext.Clients.All.ledOnOffSetStateCommand(JsonConvert.SerializeObject(command));
+            DeviceHubContext.Clients.All.LedOnOffSetStateCommand(JsonConvert.SerializeObject(command));
 
             return RedirectToAction("Index");
         }

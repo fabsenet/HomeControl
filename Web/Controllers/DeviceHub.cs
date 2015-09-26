@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using HomeControl.Shared.Contract;
 using HomeControl.Shared.Model;
 using JetBrains.Annotations;
 using Microsoft.AspNet.SignalR;
@@ -13,7 +14,7 @@ using Web.Models;
 
 namespace Web.Controllers
 {
-    public class DeviceHub : Hub
+    public class DeviceHub : Hub<IDeviceHubClient>, IDeviceHubServer
     {
         private readonly IDocumentStore _documentStore;
 
