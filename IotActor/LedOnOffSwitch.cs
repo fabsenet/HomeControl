@@ -81,11 +81,8 @@ namespace IotActor
             }
             do
             {
-                Func<bool> action;
-                if (_actions.TryTake(out action))
-                {
-                    IsOn = action();
-                }
+                var action = _actions.Take(token);
+                IsOn = action();
 
             } while (!token.IsCancellationRequested);
 
