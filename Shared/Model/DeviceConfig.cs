@@ -15,12 +15,14 @@ namespace HomeControl.Shared.Model
         public bool IsCurrentlyOnline { get; set; }
 
         [JsonIgnore]
-        public bool ConsideredOnline => IsCurrentlyOnline && LastOnlineTime + TimeSpan.FromMinutes(10) > DateTime.UtcNow;
+        public bool ConsideredOnline => IsCurrentlyOnline && LastOnlineTime + TimeSpan.FromMinutes(3) > DateTime.UtcNow;
 
         public Dictionary<int,bool> LedStatesByPinNumber { get; set; }=new Dictionary<int, bool>();
 
         public List<LedOnOffSwitchConfiguration> LedOnOffSwitchConfigurations { get; set; } = new List<LedOnOffSwitchConfiguration>();
 
         public bool PowerStateControllable { get; set; }
+
+        public TimeSpan? ApplicationlevelPingTimeSpan { get; set; }
     }
 }

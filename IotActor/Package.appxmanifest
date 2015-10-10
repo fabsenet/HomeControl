@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" IgnorableNamespaces="uap mp">
-  <Identity Name="987594a5-50ea-4177-b3fb-f4ac12778967" Publisher="CN=Fabian" Version="1.0.0.0" />
+  <Identity Name="987594a5-50ea-4177-b3fb-f4ac12778967" Publisher="CN=Fabian" Version="1.0.1.0" />
   <mp:PhoneIdentity PhoneProductId="987594a5-50ea-4177-b3fb-f4ac12778967" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
     <DisplayName>IotActor</DisplayName>

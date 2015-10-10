@@ -30,31 +30,47 @@
                         {
                             <span class="label label-danger">offline</span>
                         }</td>
-                    <td>@foreach (var ledConfig in deviceConfig.LedOnOffSwitchConfigurations)
+                    <td>
+                        @foreach (var ledConfig in deviceConfig.LedOnOffSwitchConfigurations)
                         {
                             var currentState = deviceConfig.LedStatesByPinNumber.GetOrDefault(ledConfig.PinNumber);
 
-                            @Html.ActionLink(ledConfig.Name, "SetLight"
-                                , new {DeviceName = deviceConfig.Hostname, DesiredState = !currentState, PinNumber = ledConfig.PinNumber}
-                                , new {@class = currentState ? "btn btn-success" : "btn btn-danger" })
-                        }
-                    @if (deviceConfig.PowerStateControllable)
-                    {
-                        @Html.ActionLink("Standby", "TransitionPowerState"
-                       , new { DeviceName = deviceConfig.Hostname, DesiredPowerState = PowerStateEnum.Standby }
-                       , new { @class = "btn btn-warning" })
+                            using (Html.BeginForm("SetLight", "Home"))
+                            {
+                                @Html.AntiForgeryToken()
+                                @Html.Hidden("DeviceName", deviceConfig.Hostname)
+                                @Html.Hidden("DesiredState", !currentState)
+                                @Html.Hidden("PinNumber", ledConfig.PinNumber)
 
-                        @Html.ActionLink("Shutdown", "TransitionPowerState"
-                       , new {DeviceName = deviceConfig.Hostname, DesiredPowerState = PowerStateEnum.Shutdown }
-                       , new {@class="btn btn-warning"})
-                    }</td>
+                                if (currentState)
+                                {
+                                    <button type="submit" class="btn btn-success">@ledConfig.Name</button>
+                                }
+                                else
+                                {
+                                    <button type="submit" class="btn btn-danger">@ledConfig.Name</button>
+                                }
+                            }
+
+                            if (deviceConfig.PowerStateControllable)
+                            {
+                                @Html.ActionLink("Standby", "TransitionPowerState"
+                                    , new {DeviceName = deviceConfig.Hostname, DesiredPowerState = PowerStateEnum.Standby}
+                                    , new {@class = "btn btn-warning"})
+
+                                @Html.ActionLink("Shutdown", "TransitionPowerState"
+                                    , new {DeviceName = deviceConfig.Hostname, DesiredPowerState = PowerStateEnum.Shutdown}
+                                    , new {@class = "btn btn-warning"})
+                            }
+                        }
+                    </td>
                 </tr>
             }
             </tbody>
         </table>
     </div>
     <div class="col-md-6">
-        <h2 class="label label-danger">Offline</h2>
+        <h2>Offline</h2>
         <table class="table table-hover table-responsive table-striped">
             <thead>
             <tr>
@@ -63,7 +79,7 @@
             </tr>
             </thead>
             <tbody>
-            @foreach (var deviceConfig in Model.DeviceConfigsOnline)
+            @foreach (var deviceConfig in Model.DeviceConfigsOffline)
             {
                 <tr>
                     <td>@deviceConfig.Hostname</td>

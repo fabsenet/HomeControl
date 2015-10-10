@@ -50,21 +50,23 @@ namespace Web.Controllers
             _connectedDevices.RemoveAll(dc => dc.ConnectionId == connectionId);
         }
 
-        private void SetOnline(string deviceName)
+        private DeviceConfig SetOnline(string deviceName)
         {
             using (var session = _documentStore.OpenSession())
             {
-                var pingId = "DeviceConfigs/" + deviceName;
-                var ping = session.Load<DeviceConfig>(pingId);
-                if (ping == null)
+                var deviceConfigId = "DeviceConfigs/" + deviceName;
+                var deviceConfig = session.Load<DeviceConfig>(deviceConfigId);
+                if (deviceConfig == null)
                 {
-                    ping = new DeviceConfig { Id = pingId, Hostname = deviceName };
-                    session.Store(ping);
+                    deviceConfig = new DeviceConfig { Id = deviceConfigId, Hostname = deviceName };
+                    session.Store(deviceConfig);
                 }
 
-                ping.LastOnlineTime = DateTime.UtcNow;
-                ping.IsCurrentlyOnline = true;
+                deviceConfig.LastOnlineTime = DateTime.UtcNow;
+                deviceConfig.IsCurrentlyOnline = true;
                 session.SaveChanges();
+
+                return deviceConfig;
             }
         }
 
@@ -96,10 +98,22 @@ namespace Web.Controllers
             var request = JsonConvert.DeserializeObject<DeviceConfigRequest>(deviceConfigRequestJson);
             Debug.WriteLine("received hello from device: "+request.DeviceName);
 
-            //todo: read actual config here
-            var deviceConfigResponse = new DeviceConfigResponse();
-            deviceConfigResponse.LedOnOffSwitches.Add(new LedOnOffSwitchConfiguration() {InitialState = false,PinNumber = 18});
-            deviceConfigResponse.ApplicationlevelPingTimeSpan = TimeSpan.FromSeconds(7);
+            var device = SetOnline(request.DeviceName);
+
+            var deviceConfigResponse = new DeviceConfigResponse
+                                       {
+                                           ApplicationlevelPingTimeSpan = device.ApplicationlevelPingTimeSpan ?? TimeSpan.FromSeconds(7),
+                                       };
+            deviceConfigResponse.LedOnOffSwitches.AddRange(device.LedOnOffSwitchConfigurations);
+
+            //update known device state to initial state
+            device.LedStatesByPinNumber = deviceConfigResponse.LedOnOffSwitches.ToDictionary(l => l.PinNumber, l => l.InitialState);
+
+            using (var session = _documentStore.OpenSession())
+            {
+                session.Store(device);
+                session.SaveChanges();
+            }
 
             AddDevice(request.DeviceName, Context.ConnectionId);
             Clients.Caller.Configure(JsonConvert.SerializeObject(deviceConfigResponse));

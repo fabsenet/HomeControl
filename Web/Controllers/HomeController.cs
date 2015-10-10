@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.UI.WebControls;
 using HomeControl.Shared.Contract;
 using HomeControl.Shared.Model;
 using Microsoft.AspNet.SignalR;
@@ -53,10 +54,28 @@ namespace Web.Controllers
             return View();
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult SetLight(string deviceName, bool desiredState, int pinNumber)
         {
-            var command = new LedOnOffSetStateCommand() {DesiredState = desiredState, PinNumber = pinNumber};
-            DeviceHubContext.Clients.All.LedOnOffSetStateCommand(JsonConvert.SerializeObject(command));
+            //send command to actual device
+            var connectedDevice = GetClient(deviceName);
+            if (connectedDevice == null) return Content("Device not connected :-(");
+
+            var command = new LedOnOffSetStateCommand()
+                          {
+                              DesiredState = desiredState,
+                              PinNumber = pinNumber
+                          };
+            connectedDevice.LedOnOffSetStateCommand(JsonConvert.SerializeObject(command));
+
+            //update known state of device
+            using (var session = _documentStore.OpenSession())
+            {
+                var device = session.Load<DeviceConfig>("DeviceConfigs/" + deviceName);
+                device.LedStatesByPinNumber[pinNumber] = desiredState;
+                session.SaveChanges();
+            }
 
             return RedirectToAction("Index");
         }
