@@ -2,38 +2,40 @@ import datetime
 import logging
 import zmq
 import json
-from gpiocrust import PWMOutputPin,InputPin,OutputPin
+from gpiocrust import PWMOutputPin,InputPin,OutputPin, Header
 
 class Client(object):
     ctx = None
     socket = None
 
     def __init__(self, server_uri):
-        self.pins = {}
-        logging.info("The client is using the uri {} to connect to the server.".format(server_uri))
 
-        self.ctx = zmq.Context()
+        with Header() as header:
+            self.pins = {}
+            logging.info("The client is using the uri {} to connect to the server.".format(server_uri))
 
-        self.socket = self.ctx.socket(zmq.DEALER)
+            self.ctx = zmq.Context()
 
-        self.socket.setsockopt_string(zmq.IDENTITY, self.get_hostname())
-        self.socket.connect(server_uri)
+            self.socket = self.ctx.socket(zmq.DEALER)
 
-        self.sendConfigurationRequest()
+            self.socket.setsockopt_string(zmq.IDENTITY, self.get_hostname())
+            self.socket.connect(server_uri)
 
-        handlers = {
-            "ConfigurationResponse": lambda msg: self.handle_configuration_response(msg),
-            "SetPinValue": lambda msg: self.handle_set_pin_value(msg),
-            "Unknown": lambda msg: self.handle_unknown_message(msg),
-        }
+            self.sendConfigurationRequest()
 
-        while self.socket.poll(timeout=5000):
-            msgType = self.socket.recv_string(zmq.RCVMORE)
-            msg = self.socket.recv_json()
-            handler = handlers.get(msgType, handlers["Unknown"])
-            handler(msg)
+            handlers = {
+                "ConfigurationResponse": lambda msg: self.handle_configuration_response(msg),
+                "SetPinValue": lambda msg: self.handle_set_pin_value(msg),
+                "Unknown": lambda msg: self.handle_unknown_message(msg),
+            }
 
-        print("done")
+            while self.socket.poll(timeout=5000):
+                msgType = self.socket.recv_string(zmq.RCVMORE)
+                msg = self.socket.recv_json()
+                handler = handlers.get(msgType, handlers["Unknown"])
+                handler(msg)
+
+            print("done")
 
     def handle_configuration_response(self, msg):
         logging.info("Received a ConfigurationResponse msg. Complete msg: {}".format(msg))
@@ -64,6 +66,7 @@ class Client(object):
         })
 
     def SetupGpioPins(self, gpiopins):
+
         for gpioPin in gpiopins:
             typ = gpioPin["Type"]
             pin = None;

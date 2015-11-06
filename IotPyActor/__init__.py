@@ -1,6 +1,5 @@
-import os
-import sys
 import logging
+import sys
 
 from IotPyActor.client import Client
 
