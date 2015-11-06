@@ -1,37 +1,75 @@
+import datetime
 import logging
 import zmq
+import json
+from gpiocrust import PWMOutputPin,InputPin,OutputPin
 
 class Client(object):
+    ctx = None
+    socket = None
+
     def __init__(self, server_uri):
+        self.pins = {}
         logging.info("The client is using the uri {} to connect to the server.".format(server_uri))
 
-        hostname = "asd"
+        self.ctx = zmq.Context()
 
-        ctx = zmq.Context()
-        socket = ctx.socket(zmq.DEALER)
-        socket.setsockopt_string(zmq.IDENTITY, self.getHostname())
-        socket.connect(server_uri)
-        msg = ConfigurationRequest(self.getHostname())
-        #socket.send_string("hallo welt")
-        socket.send_pyobj(msg)
+        self.socket = self.ctx.socket(zmq.DEALER)
 
-        print(socket.recv_string())
+        self.socket.setsockopt_string(zmq.IDENTITY, self.get_hostname())
+        self.socket.connect(server_uri)
 
-    def getHostname(self):
+        self.sendConfigurationRequest()
+
+        handlers = {
+            "ConfigurationResponse": lambda msg: self.handle_configuration_response(msg),
+            "SetPinValue": lambda msg: self.handle_set_pin_value(msg),
+            "Unknown": lambda msg: self.handle_unknown_message(msg),
+        }
+
+        while self.socket.poll(timeout=5000):
+            msgType = self.socket.recv_string(zmq.RCVMORE)
+            msg = self.socket.recv_json()
+            handler = handlers.get(msgType, handlers["Unknown"])
+            handler(msg)
+
+        print("done")
+
+    def handle_configuration_response(self, msg):
+        logging.info("Received a ConfigurationResponse msg. Complete msg: {}".format(msg))
+        if msg["GpioPins"] is not None:
+            self.GpioPins = self.SetupGpioPins(msg["GpioPins"])
+
+    def handle_set_pin_value(self, msg):
+        logging.info("Received a SetPin msg. Complete msg: {}".format(msg))
+        pinNumber = msg["PinNumber"]
+        value = msg["Value"]
+        self.pins[pinNumber].Value = value
+
+    def handle_unknown_message(self, msg):
+        logging.error("Received an unexpected msg type. Complete msg: {}".format(msg))
+
+    def get_hostname(self):
+        # https://stackoverflow.com/questions/4271740/how-can-i-use-python-to-get-the-system-hostname
         import platform
         hostname = platform.node()
         logging.info("the hostname of this host is '{}'".format(hostname))
         return hostname
 
-class Message(object):
-    __type ="Message"
+    def sendConfigurationRequest(self):
+        self.socket.send_string("ConfigurationRequest", zmq.SNDMORE)
+        self.socket.send_json({
+            "Hostname":self.get_hostname(),
+            "CreateDate": datetime.datetime.now().isoformat()
+        })
 
-class PingMessage(Message):
-    __type = "PingMessage"
+    def SetupGpioPins(self, gpiopins):
+        for gpioPin in gpiopins:
+            typ = gpioPin["Type"]
+            pin = None;
+            pinNumber = gpioPin["PinNumber"]
+            if(typ == "PwmOut"):
+                pin = PWMOutputPin(pinNumber , gpioPin.get("Frequency", 200) , gpioPin.get("InitialValue", 0))
 
-class ConfigurationRequest(Message):
-    __type = "ConfigurationRequest"
-    __hostname = None
-
-    def __init__(self, hostname):
-        __hostname = hostname
+            self.pins[pinNumber] = pin
+        logging.info("SetupGpioPins done. Pins are {}".format(self.pins))
