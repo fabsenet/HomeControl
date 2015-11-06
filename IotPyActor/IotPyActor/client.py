@@ -46,7 +46,7 @@ class Client(object):
         logging.info("Received a SetPin msg. Complete msg: {}".format(msg))
         pinNumber = msg["PinNumber"]
         value = msg["Value"]
-        self.pins[pinNumber].Value = value
+        self.pins[pinNumber].value = value
 
     def handle_unknown_message(self, msg):
         logging.error("Received an unexpected msg type. Complete msg: {}".format(msg))
