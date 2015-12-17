@@ -37,7 +37,6 @@ namespace HomeControl.EndpointNodeService
 
             var logger = new LoggerConfiguration()
                 .MinimumLevel.Verbose()
-                .WriteTo.RavenDB(logs)
                 .WriteTo.Trace()
                 .WriteTo.ColoredConsole()
                 .Enrich.WithMachineName()

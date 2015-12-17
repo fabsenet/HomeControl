@@ -67,11 +67,16 @@ namespace CentralHubService
             }
         }
 
-        private NetMQMessage HandleOneMsg(NetMQMessage msg)
+        private NetMQMessage HandleOneMsg(NetMQMessage mqMsg)
         {
-            var msgType = msg.Pop().ConvertToString();
-            var msgJson = msg.Pop().ConvertToString();
-            JsonConvert.DeserializeObject(msgJson, Type.GetType(msgType))
+            var senderIdentity = mqMsg.Pop().ToByteArray();
+            var msgType = mqMsg.Pop().ConvertToString();
+            var msgJson = mqMsg.Pop().ConvertToString();
+            var type = Type.GetType(msgType);
+            var msg = JsonConvert.DeserializeObject(msgJson, type);
+
+            //TODO handle msg based on its type and optionally return a response
+            throw new NotImplementedException();
         }
 
         public void StopHub()
