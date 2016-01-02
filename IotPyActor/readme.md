@@ -39,3 +39,5 @@ git -C /home/pi/HomeControl/ fetch
 git -C /home/pi/HomeControl/ reset --hard origin/master
 python3 /home/pi/HomeControl/IotPyActor/__init__.py tcp://your-servername-or-ip:5556 &
 ```
+
+The next time the RPi starts, IotPyActor will start as well.
