@@ -40,7 +40,7 @@ class Client(object):
     def handle_configuration_response(self, msg):
         logging.info("Received a ConfigurationResponse msg. Complete msg: {}".format(msg))
         if msg["GpioPins"] is not None:
-            self.GpioPins = self.SetupGpioPins(msg["GpioPins"])
+            self.SetupGpioPins(msg["GpioPins"])
 
     def handle_set_pin_value(self, msg):
         logging.info("Received a SetPin msg. Complete msg: {}".format(msg))
