@@ -24,7 +24,7 @@ namespace Web
         {
             var documentStore = new DocumentStore { ConnectionStringName = "HomeControlDB" }.Initialize();
 
-            Task.Factory.StartNew(() => ZeroMqTest());
+     //       Task.Factory.StartNew(() => ZeroMqTest());
 
             AreaRegistration.RegisterAllAreas();
 
@@ -36,6 +36,7 @@ namespace Web
             BundleConfig.RegisterBundles(BundleTable.Bundles);
         }
 
+/*
       private async Task ZeroMqTest()
       {
             using (var context = NetMQContext.Create())
@@ -120,5 +121,6 @@ namespace Web
                 }
             }
         }
+*/
     }
 }

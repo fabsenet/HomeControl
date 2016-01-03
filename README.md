@@ -19,9 +19,9 @@ This is an unicast message without any response at all.
 
 Samples are sensor data and the (client) heartbeat.
 
-## Command/Result
+## Command/(Result)
 A `command` is a message which is sent from the server to a single
-client. The client processes it and answers with exactly one `Result` 
+client. The client processes it and optionally answers with exactly one `Result` 
 message.
 
 An example is the command to enable an LED or to shutdown a PC 

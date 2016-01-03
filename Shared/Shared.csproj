@@ -35,8 +35,9 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Model\DeviceConfigRequest.cs" />
-    <Compile Include="Model\DeviceConfigResponse.cs" />
+    <Compile Include="Model\ConfigurationRequest.cs" />
+    <Compile Include="Model\ConfigurationResponse.cs" />
+    <Compile Include="Model\InputChangedTelemetry.cs" />
     <Compile Include="Model\Interfaces\IMessage.cs" />
     <Compile Include="Model\Interfaces\IMessageEnvelope.cs" />
     <Compile Include="Model\LedOnOffSetStateCommand.cs" />

@@ -37,7 +37,7 @@
                             using (Html.BeginForm("SetLight", "Home"))
                             {
                                 @Html.AntiForgeryToken()
-                                @Html.Hidden("DeviceName", deviceConfig.Hostname)
+                                @Html.Hidden("Hostname", deviceConfig.Hostname)
                                 @Html.Hidden("DesiredState", !currentState)
                                 @Html.Hidden("PinNumber", ledConfig.PinNumber)
 
@@ -54,11 +54,11 @@
                             if (deviceConfig.PowerStateControllable)
                             {
                                 @Html.ActionLink("Standby", "TransitionPowerState"
-                                    , new {DeviceName = deviceConfig.Hostname, DesiredPowerState = PowerStateEnum.Standby}
+                                    , new {Hostname = deviceConfig.Hostname, DesiredPowerState = PowerStateEnum.Standby}
                                     , new {@class = "btn btn-warning"})
 
                                 @Html.ActionLink("Shutdown", "TransitionPowerState"
-                                    , new {DeviceName = deviceConfig.Hostname, DesiredPowerState = PowerStateEnum.Shutdown}
+                                    , new {Hostname = deviceConfig.Hostname, DesiredPowerState = PowerStateEnum.Shutdown}
                                     , new {@class = "btn btn-warning"})
                             }
                         }

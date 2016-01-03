@@ -1,14 +1,18 @@
-﻿namespace HomeControl.Shared.Model
+﻿using HomeControl.Shared.Model.Interfaces;
+
+namespace HomeControl.Shared.Model
 {
-    public class LedOnOffSetStateCommand
+    public class LedOnOffSetStateCommand : IMessage
     {
         public int PinNumber { get; set; }
 
         /// <summary>
-        /// true means on / high
-        /// false means off / low
+        /// Represents the state of the output/LED:
+        /// 0.0f => off
+        /// 1.0f => on
+        /// 0.0..1.0 => dimmed
         /// </summary>
-        public bool DesiredState { get; set; }
+        public float Value { get; set; }
 
     }
 }

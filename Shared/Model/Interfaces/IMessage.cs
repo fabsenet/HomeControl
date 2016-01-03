@@ -1,4 +1,4 @@
-﻿namespace HomeControl.Hub.Handlers
+﻿namespace HomeControl.Shared.Model.Interfaces
 {
     public interface IMessage
     {

@@ -3,6 +3,7 @@ import logging
 import zmq
 import json
 from gpiocrust import PWMOutputPin,InputPin,OutputPin, Header
+from subprocess import call
 
 class Client(object):
     ctx = None
@@ -26,7 +27,8 @@ class Client(object):
                  while not self.hasConfiguration and self.socket.poll(timeout=15000):
                     msgType = self.socket.recv_string(zmq.RCVMORE)
                     msg = self.socket.recv_json()
-                    # ignore any other message, or maybe queue them and handle them after the cofiguration is done?
+                    # ignore any other message
+                    # TODO: maybe queue them and handle them after the configuration is done?
                     if msgType != "ConfigurationResponse":
                         logging.warning("Ignoring message of type '{}' while waiting for a ConfigurationResponse".format(msgType))
                         continue
@@ -34,7 +36,8 @@ class Client(object):
 
             handlers = {
                 "ConfigurationResponse": lambda msg: logging.info("Ignored another ConfigurationResponse"),
-                "SetPinValue": lambda msg: self.handle_set_pin_value(msg),
+                "LedOnOffSetStateCommand": lambda msg: self.handle_set_pin_value(msg),
+                "TransitionPowerStateCommand": lambda msg: self.handle_transition_power_state_command(msg),
             }
 
             # this is the main messaging loop which should never exit
@@ -63,6 +66,18 @@ class Client(object):
         value = msg["Value"]
         self.pins[pinNumber].value = value
 
+    def handle_transition_power_state_command(self, msg):
+        logging.info("received a command to change the power state. msg: {}".format(msg))
+        desired_state = msg["DesiredPowerState"];
+        if desired_state == "Restart":
+            logging.info('calling call(["shutdown", "-r now"])')
+            #call(["shutdown", "-r now"])
+        elif desired_state == "Shutdown":
+            logging.info('calling call(["shutdown", "-h now"])')
+            #call(["shutdown", "-h now"])
+        else:
+            logging.error("the desired power state '{}' is not supported")
+
     def handle_unknown_message(self,msgType, msg):
         logging.error("Received an unexpected msg type '{}'. Complete msg: {}".format(msgType, msg))
 
@@ -77,7 +92,7 @@ class Client(object):
         logging.info("Sending a ConfigurationRequest")
         self.socket.send_string("ConfigurationRequest", zmq.SNDMORE)
         self.socket.send_json({
-            "Hostname":self.get_hostname(),
+            "Hostname": self.get_hostname(),
             "CreateDate": datetime.datetime.now().isoformat()
         })
 

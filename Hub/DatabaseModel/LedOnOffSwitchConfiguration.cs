@@ -1,4 +1,4 @@
-﻿namespace HomeControl.Shared.Model
+﻿namespace HomeControl.Hub.DatabaseModel
 {
     public class LedOnOffSwitchConfiguration
     {

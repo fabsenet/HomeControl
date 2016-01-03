@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using HomeControl.Shared.Model;
 using Raven.Imports.Newtonsoft.Json;
 
-namespace HomeControl.Shared.Model
+namespace HomeControl.Hub.DatabaseModel
 {
     public class DeviceConfig
     {

@@ -7,7 +7,7 @@ using NetMQ;
 using NetMQ.Sockets;
 using Serilog;
 
-namespace HomeControl.EndpointNodeService
+namespace HomeControl.Agent
 {
     public class EndpointCommunicationClientService : ServiceBase
     {

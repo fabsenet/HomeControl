@@ -1,15 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.ServiceProcess;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
-using Raven.Client.Document;
 using Serilog;
 
-namespace CentralHubService
+namespace HomeControl.Hub
 {
     static class Program
     {
@@ -24,7 +19,8 @@ namespace CentralHubService
             var serviceToRun = new HubService(log.ForContext<HubService>());
             if (Environment.UserInteractive)
             {
-                var t = new Thread(serviceToRun.StartHub);
+                var t = new Thread(serviceToRun.StartHub) {Name = "Hub Thread", IsBackground = true};
+                t.Start();
                 Console.WriteLine("press enter to stop the hub...");
                 Console.ReadLine();
                 log.Information("stopping hub service.");

@@ -5,6 +5,7 @@
         Running,
         Standby,
         Hibernate,
-        Shutdown
+        Shutdown,
+        Restart
     }
 }

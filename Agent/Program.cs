@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
 using System.ServiceProcess;
 using Raven.Client.Document;
 using Serilog;
 
-namespace HomeControl.EndpointNodeService
+namespace HomeControl.Agent
 {
     static class Program
     {
