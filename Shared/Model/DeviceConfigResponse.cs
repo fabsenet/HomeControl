@@ -7,9 +7,9 @@ namespace HomeControl.Shared.Model
     {
         public DeviceConfigResponse()
         {
-            LedOnOffSwitches = new List<LedOnOffSwitchConfiguration>();
+            //LedOnOffSwitches = new List<LedOnOffSwitchConfiguration>();
         }
-        public List<LedOnOffSwitchConfiguration> LedOnOffSwitches { get; private set; }
+        //public List<LedOnOffSwitchConfiguration> LedOnOffSwitches { get; private set; }
         public TimeSpan? ApplicationlevelPingTimeSpan { get; set; }
     }
 }

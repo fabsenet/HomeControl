@@ -1,7 +1,6 @@
 ﻿@using HomeControl.Shared.Model
 @using Humanizer
 @using Raven.Abstractions.Extensions
-@model Web.Models.HomeControllerIndexModel
 @{
     ViewBag.Title = "Home Page";
 }
@@ -18,7 +17,7 @@
             </tr>
             </thead>
             <tbody>
-            @foreach (var deviceConfig in Model.DeviceConfigsOnline)
+            @*@foreach (var deviceConfig in Model.DeviceConfigsOnline)
             {
                 <tr>
                     <td>@deviceConfig.Hostname</td>
@@ -65,7 +64,7 @@
                         }
                     </td>
                 </tr>
-            }
+            }*@
             </tbody>
         </table>
     </div>
@@ -79,13 +78,13 @@
             </tr>
             </thead>
             <tbody>
-            @foreach (var deviceConfig in Model.DeviceConfigsOffline)
+            @*@foreach (var deviceConfig in Model.DeviceConfigsOffline)
             {
                 <tr>
                     <td>@deviceConfig.Hostname</td>
                     <td>@deviceConfig.LastOnlineTime.Humanize()</td>
                 </tr>
-            }
+            }*@
             </tbody>
         </table>
     </div>

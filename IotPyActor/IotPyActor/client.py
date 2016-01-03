@@ -7,6 +7,7 @@ from gpiocrust import PWMOutputPin,InputPin,OutputPin, Header
 class Client(object):
     ctx = None
     socket = None
+    hasConfiguration = False
 
     def __init__(self, server_uri):
 
@@ -14,33 +15,47 @@ class Client(object):
             self.pins = {}
             logging.info("The client is using the uri {} to connect to the server.".format(server_uri))
 
+            # Setup ZeroMQ
             self.ctx = zmq.Context()
-
             self.socket = self.ctx.socket(zmq.DEALER)
-
-            self.socket.setsockopt_string(zmq.IDENTITY, self.get_hostname())
             self.socket.connect(server_uri)
 
-            self.sendConfigurationRequest()
+            # before we can handle any other messages, we need to get the configuration of this client done
+            while not self.hasConfiguration:
+                 self.send_configuration_request()
+                 while not self.hasConfiguration and self.socket.poll(timeout=15000):
+                    msgType = self.socket.recv_string(zmq.RCVMORE)
+                    msg = self.socket.recv_json()
+                    # ignore any other message, or maybe queue them and handle them after the cofiguration is done?
+                    if msgType != "ConfigurationResponse":
+                        logging.warning("Ignoring message of type '{}' while waiting for a ConfigurationResponse".format(msgType))
+                        continue
+                    self.handle_configuration_response(msg)
 
             handlers = {
-                "ConfigurationResponse": lambda msg: self.handle_configuration_response(msg),
+                "ConfigurationResponse": lambda msg: logging.info("Ignored another ConfigurationResponse"),
                 "SetPinValue": lambda msg: self.handle_set_pin_value(msg),
-                "Unknown": lambda msg: self.handle_unknown_message(msg),
             }
 
-            while self.socket.poll(timeout=5000):
-                msgType = self.socket.recv_string(zmq.RCVMORE)
-                msg = self.socket.recv_json()
-                handler = handlers.get(msgType, handlers["Unknown"])
-                handler(msg)
+            # this is the main messaging loop which should never exit
+            while True:
+                while self.socket.poll(timeout=15000):
+                    msgType = self.socket.recv_string(zmq.RCVMORE)
+                    msg = self.socket.recv_json()
+                    handler = handlers.get(msgType, lambda msg: self.handle_unknown_message(msgType, msg))
+                    handler(msg)
 
-            print("done")
+            logging.info("closing socket")
+            self.socket.close(1000)
+            logging.info("destroying context")
+            self.ctx.destroy(1000)
+            logging.info("done, bye")
 
     def handle_configuration_response(self, msg):
         logging.info("Received a ConfigurationResponse msg. Complete msg: {}".format(msg))
         if msg["GpioPins"] is not None:
-            self.SetupGpioPins(msg["GpioPins"])
+            self.setup_gpio_pins(msg["GpioPins"])
+        self.hasConfiguration = True
 
     def handle_set_pin_value(self, msg):
         logging.info("Received a SetPin msg. Complete msg: {}".format(msg))
@@ -48,8 +63,8 @@ class Client(object):
         value = msg["Value"]
         self.pins[pinNumber].value = value
 
-    def handle_unknown_message(self, msg):
-        logging.error("Received an unexpected msg type. Complete msg: {}".format(msg))
+    def handle_unknown_message(self,msgType, msg):
+        logging.error("Received an unexpected msg type '{}'. Complete msg: {}".format(msgType, msg))
 
     def get_hostname(self):
         # https://stackoverflow.com/questions/4271740/how-can-i-use-python-to-get-the-system-hostname
@@ -58,14 +73,15 @@ class Client(object):
         logging.info("the hostname of this host is '{}'".format(hostname))
         return hostname
 
-    def sendConfigurationRequest(self):
+    def send_configuration_request(self):
+        logging.info("Sending a ConfigurationRequest")
         self.socket.send_string("ConfigurationRequest", zmq.SNDMORE)
         self.socket.send_json({
             "Hostname":self.get_hostname(),
             "CreateDate": datetime.datetime.now().isoformat()
         })
 
-    def SetupGpioPins(self, gpiopins):
+    def setup_gpio_pins(self, gpiopins):
 
         for gpioPin in gpiopins:
             typ = gpioPin["Type"]

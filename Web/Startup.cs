@@ -6,7 +6,6 @@ using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
 using JetBrains.Annotations;
-using Microsoft.AspNet.SignalR;
 using Microsoft.Owin;
 using NetMQ;
 using Newtonsoft.Json;
@@ -25,10 +24,6 @@ namespace Web
         {
             var documentStore = new DocumentStore { ConnectionStringName = "HomeControlDB" }.Initialize();
 
-            GlobalHost.DependencyResolver.Register(typeof (DeviceHub), () => new DeviceHub(documentStore));
-
-            app.MapSignalR();
-
             Task.Factory.StartNew(() => ZeroMqTest());
 
             AreaRegistration.RegisterAllAreas();
@@ -46,7 +41,7 @@ namespace Web
             using (var context = NetMQContext.Create())
             using (var socket = context.CreateRouterSocket())
             {
-                socket.Bind("tcp://*:1030");
+                socket.Bind("tcp://*:5556");
                 while (true)
                 {
                     var msg = socket.ReceiveMultipartMessage();

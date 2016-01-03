@@ -76,6 +76,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DatabaseModel\DeviceConfig.cs" />
+    <Compile Include="DatabaseModel\LedOnOffSwitchConfiguration.cs" />
     <Compile Include="HubService.cs">
       <SubType>Component</SubType>
     </Compile>

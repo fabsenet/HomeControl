@@ -35,11 +35,11 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Model\DeviceConfig.cs" />
     <Compile Include="Model\DeviceConfigRequest.cs" />
     <Compile Include="Model\DeviceConfigResponse.cs" />
+    <Compile Include="Model\Interfaces\IMessage.cs" />
+    <Compile Include="Model\Interfaces\IMessageEnvelope.cs" />
     <Compile Include="Model\LedOnOffSetStateCommand.cs" />
-    <Compile Include="Model\LedOnOffSwitchConfiguration.cs" />
     <Compile Include="Model\PingResponse.cs" />
     <Compile Include="Model\PowerStateEnum.cs" />
     <Compile Include="Model\TransitionPowerStateCommand.cs" />
