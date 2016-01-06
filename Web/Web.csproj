@@ -173,6 +173,7 @@
     <Compile Include="App_Start\MvcConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Controllers\InteractionsController.cs" />
     <Compile Include="Controllers\LogAction.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Global.asax.cs">

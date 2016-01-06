@@ -9,6 +9,7 @@ using JetBrains.Annotations;
 using Microsoft.Owin;
 using NetMQ;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using Owin;
 using Raven.Client.Document;
 using Web;
@@ -22,9 +23,16 @@ namespace Web
         [UsedImplicitly]
         public void Configuration(IAppBuilder app)
         {
+            //app.MapSignalR();
             var documentStore = new DocumentStore { ConnectionStringName = "HomeControlDB" }.Initialize();
 
-     //       Task.Factory.StartNew(() => ZeroMqTest());
+            JsonConvert.DefaultSettings = (() =>
+            {
+                var settings = new JsonSerializerSettings();
+                settings.Converters.Add(new StringEnumConverter());
+                return settings;
+            });
+            //       Task.Factory.StartNew(() => ZeroMqTest());
 
             AreaRegistration.RegisterAllAreas();
 
@@ -36,91 +44,91 @@ namespace Web
             BundleConfig.RegisterBundles(BundleTable.Bundles);
         }
 
-/*
-      private async Task ZeroMqTest()
-      {
-            using (var context = NetMQContext.Create())
-            using (var socket = context.CreateRouterSocket())
-            {
-                socket.Bind("tcp://*:5556");
-                while (true)
-                {
-                    var msg = socket.ReceiveMultipartMessage();
-
-                    Debug.WriteLine("Received msg with {0} frames", msg.FrameCount);
-
-                    for (int i = 0; i < msg.FrameCount; i++)
+        /*
+              private async Task ZeroMqTest()
+              {
+                    using (var context = NetMQContext.Create())
+                    using (var socket = context.CreateRouterSocket())
                     {
-                        if (i == 0)
+                        socket.Bind("tcp://*:5556");
+                        while (true)
                         {
-                            Debug.WriteLine("identity: " + Convert.ToBase64String(msg[i].Buffer));
-                        }
-                        else
-                        {
-                            Debug.WriteLine("frame "+i+": " + msg[i].ConvertToString());
+                            var msg = socket.ReceiveMultipartMessage();
+
+                            Debug.WriteLine("Received msg with {0} frames", msg.FrameCount);
+
+                            for (int i = 0; i < msg.FrameCount; i++)
+                            {
+                                if (i == 0)
+                                {
+                                    Debug.WriteLine("identity: " + Convert.ToBase64String(msg[i].Buffer));
+                                }
+                                else
+                                {
+                                    Debug.WriteLine("frame "+i+": " + msg[i].ConvertToString());
+                                }
+                            }
+                            Debug.WriteLine(".");
+
+                            var identity = msg[0].Buffer;
+
+                            var configMsg = new NetMQMessage();
+                            configMsg.Append(identity);
+                            configMsg.Append("ConfigurationResponse");
+                            configMsg.Append(JsonConvert.SerializeObject(new
+                                                                         {
+                                                                             GpioPins = new object[]
+                                                                                        {
+                                                                                            new
+                                                                                            {
+                                                                                                PinNumber= 12,
+                                                                                                Type= "PwmOut",
+                                                                                                InitialValue= 0.3,
+                                                                                            }
+                                                                                        }
+                                                                         }));
+                            socket.SendMultipartMessage(configMsg);
+
+                            await Task.Delay(TimeSpan.FromSeconds(1));
+
+                            var setPinValue = new NetMQMessage();
+                            setPinValue.Append(identity);
+                            setPinValue.Append("SetPinValue");
+                            setPinValue.Append(JsonConvert.SerializeObject(new
+                                                                           {
+                                                                               PinNumber = 12,
+                                                                               Value = 0.8,
+                                                                           }));
+                            socket.SendMultipartMessage(setPinValue);
+
+                            await Task.Delay(TimeSpan.FromSeconds(1));
+
+                            setPinValue = new NetMQMessage();
+                            setPinValue.Append(identity);
+                            setPinValue.Append("SetPinValue");
+                            setPinValue.Append(JsonConvert.SerializeObject(new
+                                                                           {
+                                                                               PinNumber = 12,
+                                                                               Value = 0,
+                                                                           }));
+                            socket.SendMultipartMessage(setPinValue);
+
+                            await Task.Delay(TimeSpan.FromSeconds(1));
+
+                            setPinValue = new NetMQMessage();
+                            setPinValue.Append(identity);
+                            setPinValue.Append("SetPinValue");
+                            setPinValue.Append(JsonConvert.SerializeObject(new
+                                                                           {
+                                                                               PinNumber = 12,
+                                                                               Value = 1,
+                                                                           }));
+                            socket.SendMultipartMessage(setPinValue);
+
+                            Debug.WriteLine(DateTime.Now);
                         }
                     }
-                    Debug.WriteLine(".");
-
-                    var identity = msg[0].Buffer;
-
-                    var configMsg = new NetMQMessage();
-                    configMsg.Append(identity);
-                    configMsg.Append("ConfigurationResponse");
-                    configMsg.Append(JsonConvert.SerializeObject(new
-                                                                 {
-                                                                     GpioPins = new object[]
-                                                                                {
-                                                                                    new
-                                                                                    {
-                                                                                        PinNumber= 12,
-                                                                                        Type= "PwmOut",
-                                                                                        InitialValue= 0.3,
-                                                                                    }
-                                                                                }
-                                                                 }));
-                    socket.SendMultipartMessage(configMsg);
-
-                    await Task.Delay(TimeSpan.FromSeconds(1));
-
-                    var setPinValue = new NetMQMessage();
-                    setPinValue.Append(identity);
-                    setPinValue.Append("SetPinValue");
-                    setPinValue.Append(JsonConvert.SerializeObject(new
-                                                                   {
-                                                                       PinNumber = 12,
-                                                                       Value = 0.8,
-                                                                   }));
-                    socket.SendMultipartMessage(setPinValue);
-
-                    await Task.Delay(TimeSpan.FromSeconds(1));
-
-                    setPinValue = new NetMQMessage();
-                    setPinValue.Append(identity);
-                    setPinValue.Append("SetPinValue");
-                    setPinValue.Append(JsonConvert.SerializeObject(new
-                                                                   {
-                                                                       PinNumber = 12,
-                                                                       Value = 0,
-                                                                   }));
-                    socket.SendMultipartMessage(setPinValue);
-
-                    await Task.Delay(TimeSpan.FromSeconds(1));
-
-                    setPinValue = new NetMQMessage();
-                    setPinValue.Append(identity);
-                    setPinValue.Append("SetPinValue");
-                    setPinValue.Append(JsonConvert.SerializeObject(new
-                                                                   {
-                                                                       PinNumber = 12,
-                                                                       Value = 1,
-                                                                   }));
-                    socket.SendMultipartMessage(setPinValue);
-
-                    Debug.WriteLine(DateTime.Now);
                 }
-            }
-        }
-*/
+        */
     }
 }

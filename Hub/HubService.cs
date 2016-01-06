@@ -160,6 +160,8 @@ namespace HomeControl.Hub
 
         private ConfigurationResponse HandleConfigurationRequest(ConfigurationRequest configurationRequest, byte[] senderIdentity)
         {
+            configurationRequest.Hostname = configurationRequest.Hostname.ToLowerInvariant();
+
             _senderIdentitiesByHostname[configurationRequest.Hostname] = senderIdentity;
 
             //hard coded for now

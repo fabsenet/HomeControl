@@ -3,7 +3,10 @@ using Raven.Client;
 
 namespace Web.Controllers
 {
+#if !DEBUG
     [RequireHttps]
+#endif
+
     [Authorize]
     public class HomeController : Controller
     {
