@@ -200,3 +200,4 @@ FakesAssemblies/
 ConnectionStrings.config
 ConnectionStrings.*.config
 IoTActor/Config.cs
+*.bak
