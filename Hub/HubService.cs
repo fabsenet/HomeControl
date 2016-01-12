@@ -150,8 +150,12 @@ namespace HomeControl.Hub
                 && _senderIdentitiesByHostname.ContainsKey("raspberrypi"))
             {
                 var ledCommand = new LedOnOffSetStateCommand() {PinNumber = 12, Value = inputChangedTelemetry.NewValue};
+                _log.Information("Set Light: Pin {pin} on device {device} set to brightness {brightness}"
+                    ,ledCommand.PinNumber, "raspberrypi", ledCommand.Value);
 
                 otherMessage = ledCommand.ToMqMessage(_senderIdentitiesByHostname["raspberrypi"]);
+
+                return ledCommand;
             }
             return null;
         }

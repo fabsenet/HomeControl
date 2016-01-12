@@ -17,7 +17,7 @@ namespace Web.Controllers
     {
         private static readonly object _lockObject = new object();
 
-        private static NetMQContext _context;
+        private static volatile NetMQContext _context;
         private static DealerSocket _socket;
         private static ConfigurationResponse _configuration;
 
@@ -80,6 +80,7 @@ namespace Web.Controllers
             mqMessage.Append(JsonConvert.SerializeObject(inputChanged, Formatting.None));
             _socket.SendMultipartMessage(mqMessage);
 
+            var response = _socket.ReceiveMultipartMessage();
 
             return "value";
         }
