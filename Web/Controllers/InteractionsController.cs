@@ -64,6 +64,7 @@ namespace Web.Controllers
         // GET api/<controller>/5
         public string Get(int id)
         {
+            //limit value to [0..100]
             id = Math.Max(Math.Min(100, id), 0);
 
             var inputChanged = new InputChangedTelemetry()
